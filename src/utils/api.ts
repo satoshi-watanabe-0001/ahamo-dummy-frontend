@@ -1,4 +1,5 @@
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080';
+const USE_MOCK_API = (import.meta as any).env?.VITE_USE_MOCK_API === 'true';
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -133,9 +134,22 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient();
+import { 
+  mockApiClient, 
+  mockContractApi, 
+  mockPlanApi, 
+  mockDeviceApi, 
+  mockAdminDeviceApi,
+  initializeMockData 
+} from './mockApi';
 
-export const contractApi = {
+if (USE_MOCK_API) {
+  initializeMockData();
+}
+
+export const apiClient = USE_MOCK_API ? mockApiClient : new ApiClient();
+
+export const contractApi = USE_MOCK_API ? mockContractApi : {
   getContracts: () => apiClient.get('/api/contracts'),
   getContract: (id: string) => apiClient.get(`/api/contracts/${id}`),
   createContract: (data: any) => apiClient.post('/api/contracts', data),
@@ -143,7 +157,7 @@ export const contractApi = {
   deleteContract: (id: string) => apiClient.delete(`/api/contracts/${id}`),
 };
 
-export const planApi = {
+export const planApi = USE_MOCK_API ? mockPlanApi : {
   getPlans: () => apiClient.get('/api/v1/plans'),
   getPlan: (id: string) => apiClient.get(`/api/v1/plans/${id}`),
 };
@@ -155,12 +169,12 @@ export const feeApi = {
     apiClient.post('/api/compare-fee-plans', { usage, planIds }),
 };
 
-export const deviceApi = {
+export const deviceApi = USE_MOCK_API ? mockDeviceApi : {
   getDevices: () => apiClient.get('/api/devices'),
   getDevice: (id: string) => apiClient.get(`/api/devices/${id}`),
 };
 
-export const adminDeviceApi = {
+export const adminDeviceApi = USE_MOCK_API ? mockAdminDeviceApi : {
   getAllDevices: () => apiClient.get('/api/v1/admin/devices'),
   createDevice: (data: any) => apiClient.post('/api/v1/admin/devices', data),
   updateDevice: (id: string, data: any) => apiClient.put(`/api/v1/admin/devices/${id}`, data),
