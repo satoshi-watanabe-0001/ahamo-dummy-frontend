@@ -162,6 +162,13 @@ export const planApi = USE_MOCK_API ? mockPlanApi : {
   getPlan: (id: string) => apiClient.get(`/api/v1/plans/${id}`),
 };
 
+export const feeApi = {
+  calculateFee: (data: any) => 
+    apiClient.post('/api/calculate-fee', data),
+  compareFeePlans: (usage: any, planIds: string[]) => 
+    apiClient.post('/api/compare-fee-plans', { usage, planIds }),
+};
+
 export const deviceApi = USE_MOCK_API ? mockDeviceApi : {
   getDevices: () => apiClient.get('/api/devices'),
   getDevice: (id: string) => apiClient.get(`/api/devices/${id}`),
