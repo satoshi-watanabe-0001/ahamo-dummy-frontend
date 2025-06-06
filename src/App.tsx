@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './com
 import { Badge } from './components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 import { HighContrastToggle } from './components/ui/high-contrast-toggle';
+import { PlanComparison } from './components/organisms/PlanComparison';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
@@ -57,6 +58,13 @@ function App() {
                   </div>
                 </div>
               </div>
+            </ComponentShowcase>
+
+            <ComponentShowcase 
+              title="Organisms - プラン比較機能"
+              description="プラン一覧表示・比較機能のデモ"
+            >
+              <PlanComparison />
             </ComponentShowcase>
 
             <ComponentShowcase 
