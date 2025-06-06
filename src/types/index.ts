@@ -82,6 +82,10 @@ export interface ResponsiveProps {
   desktop?: boolean;
 }
 
+
+
+export * from './accessibility';
+
 export type ComponentSize = 'sm' | 'md' | 'lg';
 export type ComponentVariant = 'default' | 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost';
 export type ComponentState = 'default' | 'hover' | 'active' | 'disabled' | 'loading';
