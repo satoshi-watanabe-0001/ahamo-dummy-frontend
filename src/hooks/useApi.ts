@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ApiResponse, ApiError } from '@/utils/api';
+import { toast } from './use-toast';
+import { getErrorMessage, getErrorResolution, getErrorSeverity } from '@/utils/errorUtils';
 
 interface UseApiState<T> {
   data: T | null;
@@ -39,6 +41,14 @@ export function useApi<T>(
         loading: false,
         error: apiError,
       });
+      
+      toast({
+        title: getErrorMessage(apiError),
+        description: getErrorResolution(apiError),
+        severity: getErrorSeverity(apiError),
+        resolution: apiError.resolution,
+      });
+      
       throw error;
     }
   }, [apiCall]);
@@ -83,6 +93,14 @@ export function useMutation<T, P = any>(
         loading: false,
         error: apiError,
       });
+      
+      toast({
+        title: getErrorMessage(apiError),
+        description: getErrorResolution(apiError),
+        severity: getErrorSeverity(apiError),
+        resolution: apiError.resolution,
+      });
+      
       throw error;
     }
   }, [apiCall]);

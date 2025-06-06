@@ -6,10 +6,18 @@ export interface ApiResponse<T = any> {
   status: number;
 }
 
+export enum ErrorSeverity {
+  CRITICAL = 'CRITICAL',
+  WARNING = 'WARNING',
+  INFO = 'INFO'
+}
+
 export interface ApiError {
   message: string;
   status: number;
   details?: any;
+  severity?: ErrorSeverity;
+  resolution?: string;
 }
 
 class ApiClient {
@@ -23,44 +31,72 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
+    const maxRetries = 3;
+    let retries = 0;
     
-    const defaultHeaders = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
+    while (true) {
+      try {
+        const url = `${this.baseURL}${endpoint}`;
+        
+        const defaultHeaders = {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        };
 
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: defaultHeaders,
-      });
+        const response = await fetch(url, {
+          ...options,
+          headers: defaultHeaders,
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw {
-          message: data.message || 'API request failed',
+        if (!response.ok) {
+          throw {
+            message: data.message || 'API request failed',
+            status: response.status,
+            details: data,
+            severity: data.severity,
+            resolution: data.resolution,
+          } as ApiError;
+        }
+
+        return {
+          data,
           status: response.status,
-          details: data,
-        } as ApiError;
+          message: data.message,
+        };
+      } catch (error) {
+        const apiError = error as ApiError;
+        const shouldRetry = this.isRetryableError(apiError) && retries < maxRetries;
+        
+        if (!shouldRetry) {
+          if (error instanceof Error) {
+            throw {
+              message: error.message,
+              status: 0,
+              details: error,
+              severity: ErrorSeverity.CRITICAL,
+              resolution: 'ネットワーク接続を確認してください'
+            } as ApiError;
+          }
+          throw error;
+        }
+        
+        const delay = Math.pow(2, retries) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        retries++;
       }
-
-      return {
-        data,
-        status: response.status,
-        message: data.message,
-      };
-    } catch (error) {
-      if (error instanceof Error) {
-        throw {
-          message: error.message,
-          status: 0,
-          details: error,
-        } as ApiError;
-      }
-      throw error;
     }
+  }
+
+  private isRetryableError(error: ApiError): boolean {
+    if (!error) return false;
+    
+    if (error instanceof TypeError && error.message.includes('Network')) return true;
+    
+    if (error.status && error.status >= 500 && error.status < 600) return true;
+    
+    return false;
   }
 
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
