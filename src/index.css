@@ -122,6 +122,67 @@
     --sidebar-border: 0 0% 0%;
     --sidebar-ring: 0 0% 0%;
   }
+
+  .high-contrast .bg-blue-600 {
+    background-color: #000000 !important;
+  }
+
+  .high-contrast .hover\:bg-blue-700:hover {
+    background-color: #000000 !important;
+  }
+
+  .high-contrast .bg-red-600 {
+    background-color: #ff0000 !important;
+  }
+
+  .high-contrast .hover\:bg-red-700:hover {
+    background-color: #ff0000 !important;
+  }
+
+  .high-contrast .border-gray-300 {
+    border-color: #000000 !important;
+  }
+
+  .high-contrast .bg-white {
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .hover\:bg-gray-50:hover {
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .bg-gray-200 {
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .text-gray-900 {
+    color: #000000 !important;
+  }
+
+  .high-contrast .hover\:bg-gray-300:hover {
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .hover\:bg-gray-100:hover {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  .high-contrast .text-blue-600 {
+    color: #000000 !important;
+  }
+
+  .high-contrast .placeholder\:text-gray-500::placeholder {
+    color: #000000 !important;
+  }
+
+  .high-contrast .focus\:ring-blue-500:focus {
+    --tw-ring-color: #000000 !important;
+  }
+
+  .high-contrast .focus\:border-blue-500:focus {
+    border-color: #000000 !important;
+  }
 }
 
 @layer base {
