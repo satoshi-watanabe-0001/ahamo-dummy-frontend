@@ -33,7 +33,7 @@ export const AdminDeviceApp = ({ className }: AdminDeviceAppProps) => {
     try {
       setLoading(true);
       const response = await adminDeviceApi.getAllDevices();
-      setDevices(response.data);
+      setDevices(response.data as Device[]);
     } catch (error) {
       console.error('デバイス一覧の取得に失敗しました:', error);
     } finally {

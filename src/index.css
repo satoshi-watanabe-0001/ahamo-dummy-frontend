@@ -87,6 +87,103 @@
   }
 }
 
+  .high-contrast {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 0%;
+    --accent: 0 0% 0%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 0%;
+    --input: 0 0% 100%;
+    --ring: 0 0% 0%;
+    
+    --success: 120 100% 25%;
+    --warning: 45 100% 35%;
+    --error: 0 100% 50%;
+    --info: 240 100% 50%;
+    
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: 0 0% 0%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 0%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 0%;
+    --sidebar-ring: 0 0% 0%;
+  }
+
+  .high-contrast .bg-blue-600 {
+    background-color: #000000 !important;
+  }
+
+  .high-contrast .hover\:bg-blue-700:hover {
+    background-color: #000000 !important;
+  }
+
+  .high-contrast .bg-red-600 {
+    background-color: #ff0000 !important;
+  }
+
+  .high-contrast .hover\:bg-red-700:hover {
+    background-color: #ff0000 !important;
+  }
+
+  .high-contrast .border-gray-300 {
+    border-color: #000000 !important;
+  }
+
+  .high-contrast .bg-white {
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .hover\:bg-gray-50:hover {
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .bg-gray-200 {
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .text-gray-900 {
+    color: #000000 !important;
+  }
+
+  .high-contrast .hover\:bg-gray-300:hover {
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .hover\:bg-gray-100:hover {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  .high-contrast .text-blue-600 {
+    color: #000000 !important;
+  }
+
+  .high-contrast .placeholder\:text-gray-500::placeholder {
+    color: #000000 !important;
+  }
+
+  .high-contrast .focus\:ring-blue-500:focus {
+    --tw-ring-color: #000000 !important;
+  }
+
+  .high-contrast .focus\:border-blue-500:focus {
+    border-color: #000000 !important;
+  }
+
 @layer base {
   * {
     @apply border-border;
