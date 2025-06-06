@@ -183,7 +183,6 @@
   .high-contrast .focus\:border-blue-500:focus {
     border-color: #000000 !important;
   }
-}
 
 @layer base {
   * {
