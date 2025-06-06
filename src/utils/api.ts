@@ -148,6 +148,13 @@ export const planApi = {
   getPlan: (id: string) => apiClient.get(`/api/v1/plans/${id}`),
 };
 
+export const feeApi = {
+  calculateFee: (data: any) => 
+    apiClient.post('/api/calculate-fee', data),
+  compareFeePlans: (usage: any, planIds: string[]) => 
+    apiClient.post('/api/compare-fee-plans', { usage, planIds }),
+};
+
 export const deviceApi = {
   getDevices: () => apiClient.get('/api/devices'),
   getDevice: (id: string) => apiClient.get(`/api/devices/${id}`),

@@ -28,6 +28,40 @@ export interface Plan {
   isPopular?: boolean;
 }
 
+export interface FeeCalculationRequest {
+  planId: string;
+  dataUsage: number;
+  callMinutes: number;
+  smsCount: number;
+}
+
+export interface FeeCalculationResult {
+  totalFee: number;
+  breakdown: {
+    baseFee: number;
+    callFee: number;
+    dataFee: number;
+    optionFees: {
+      id: string;
+      name: string;
+      fee: number;
+    }[];
+    discounts: {
+      id: string;
+      name: string;
+      amount: number;
+    }[];
+  };
+  taxIncluded: number;
+}
+
+export interface UsagePattern {
+  name: string;
+  dataUsage: number;
+  callMinutes: number;
+  smsCount: number;
+}
+
 export interface Device {
   id: string;
   name: string;
