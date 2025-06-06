@@ -4,13 +4,8 @@ import DemoLayout from './components/templates/DemoLayout';
 import ComponentShowcase from './components/templates/ComponentShowcase';
 import { Button } from './components/atoms';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './components/molecules';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './components/organisms';
-import { Input } from './components/ui/input';
-import { Label } from './components/ui/label';
 import { Badge } from './components/ui/badge';
-import { Switch } from './components/ui/switch';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from './components/organisms';
 import { HighContrastToggle } from './components/ui/high-contrast-toggle';
 
 function App() {
