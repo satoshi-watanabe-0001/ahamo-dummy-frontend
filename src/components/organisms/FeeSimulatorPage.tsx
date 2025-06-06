@@ -11,6 +11,10 @@ export const FeeSimulatorPage = () => {
     smsCount: 20
   });
 
+  const handleUsageChange = (newUsage: typeof usageParams) => {
+    setUsageParams(newUsage);
+  };
+
   return (
     <div className="space-y-8">
       <Card>
