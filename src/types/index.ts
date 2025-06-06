@@ -19,9 +19,12 @@ export interface Plan {
   id: string;
   name: string;
   description: string;
-  price: number;
-  dataLimit: string;
+  monthlyFee: number;
+  dataCapacity: string;
+  voiceCalls: string;
+  sms: string;
   features: string[];
+  isActive: boolean;
   isPopular?: boolean;
 }
 

@@ -144,8 +144,8 @@ export const contractApi = {
 };
 
 export const planApi = {
-  getPlans: () => apiClient.get('/api/plans'),
-  getPlan: (id: string) => apiClient.get(`/api/plans/${id}`),
+  getPlans: () => apiClient.get('/api/v1/plans'),
+  getPlan: (id: string) => apiClient.get(`/api/v1/plans/${id}`),
 };
 
 export const deviceApi = {
