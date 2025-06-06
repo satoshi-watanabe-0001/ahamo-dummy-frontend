@@ -1,6 +1,6 @@
 export interface BaseComponent {
   className?: string;
-  children?: React.ReactNode;
+  children?: any;
 }
 
 export interface Contract {
@@ -29,11 +29,44 @@ export interface Device {
   id: string;
   name: string;
   brand: string;
-  model: string;
+  category: 'iPhone' | 'Android';
+  priceRange: 'entry' | 'mid' | 'premium';
   price: number;
-  imageUrl?: string;
-  specifications: Record<string, string>;
+  colors: string[];
+  storageOptions: string[];
   inStock: boolean;
+  imageUrl?: string;
+  specifications?: string;
+  galleryImages?: string[];
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminDeviceRequest {
+  name: string;
+  brand: string;
+  category: 'iPhone' | 'Android';
+  priceRange: 'entry' | 'mid' | 'premium';
+  price: number;
+  colors?: string[];
+  storageOptions?: string[];
+  inStock?: boolean;
+  imageUrl?: string;
+  specifications?: string;
+  galleryImages?: string[];
+}
+
+export interface DeviceImportResult {
+  totalRows: number;
+  successfulRows: number;
+  failedRows: number;
+  errors: Array<{
+    rowNumber: number;
+    deviceId: string;
+    errorMessage: string;
+  }>;
 }
 
 export interface FormFieldProps {

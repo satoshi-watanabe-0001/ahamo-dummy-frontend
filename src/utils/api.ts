@@ -117,4 +117,28 @@ export const deviceApi = {
   getDevice: (id: string) => apiClient.get(`/api/devices/${id}`),
 };
 
+export const adminDeviceApi = {
+  getAllDevices: () => apiClient.get('/api/v1/admin/devices'),
+  createDevice: (data: any) => apiClient.post('/api/v1/admin/devices', data),
+  updateDevice: (id: string, data: any) => apiClient.put(`/api/v1/admin/devices/${id}`, data),
+  deleteDevice: (id: string) => apiClient.delete(`/api/v1/admin/devices/${id}`),
+  importDevices: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return fetch(`${API_BASE_URL}/api/v1/admin/devices/import`, {
+      method: 'POST',
+      body: formData,
+    });
+  },
+  exportDevices: () => apiClient.get('/api/v1/admin/devices/export'),
+  uploadImage: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return fetch(`${API_BASE_URL}/api/v1/admin/devices/upload-image`, {
+      method: 'POST',
+      body: formData,
+    });
+  },
+};
+
 export default apiClient;
