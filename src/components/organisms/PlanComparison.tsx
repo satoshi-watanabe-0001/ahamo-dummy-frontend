@@ -31,7 +31,7 @@ export const PlanComparison = ({
         setError(null);
         
         const response = await planApi.getPlans();
-        const data = response.data;
+        const data = response.data as any;
         setPlans(data.plans || []);
         
       } catch (err) {
@@ -54,7 +54,8 @@ export const PlanComparison = ({
         const response = await feeApi.compareFeePlans(usageParams, planIds);
         
         const resultMap: Record<string, any> = {};
-        response.data.results.forEach((result: any, index: number) => {
+        const responseData = response.data as any;
+        responseData.results.forEach((result: any, index: number) => {
           resultMap[planIds[index]] = result;
         });
         

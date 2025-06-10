@@ -27,7 +27,7 @@ export const FeeSimulator = ({ selectedPlanId }: FeeSimulatorProps) => {
     setError(null);
     try {
       const response = await feeApi.calculateFee(req);
-      setResult(response.data);
+      setResult(response.data as FeeCalculationResult);
     } catch (err) {
       setError('計算中にエラーが発生しました');
       console.error(err);

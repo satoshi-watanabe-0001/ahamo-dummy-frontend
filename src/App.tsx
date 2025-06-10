@@ -8,6 +8,7 @@ import { Badge } from './components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 import { HighContrastToggle } from './components/ui/high-contrast-toggle';
 import { PlanComparison } from './components/organisms/PlanComparison';
+import { FeeSimulator } from './components/organisms/FeeSimulator';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
@@ -114,8 +115,9 @@ function App() {
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Tabs コンポーネント</h3>
                   <Tabs defaultValue="plans" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
+                    <TabsList className="grid w-full grid-cols-4">
                       <TabsTrigger value="plans">料金プラン</TabsTrigger>
+                      <TabsTrigger value="simulator">料金シミュレーション</TabsTrigger>
                       <TabsTrigger value="devices">デバイス</TabsTrigger>
                       <TabsTrigger value="options">オプション</TabsTrigger>
                     </TabsList>
@@ -127,6 +129,17 @@ function App() {
                         </CardHeader>
                         <CardContent>
                           <p>ahamoベーシック、ahamo大盛りからお選びいただけます。</p>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                    <TabsContent value="simulator" className="space-y-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>料金シミュレーション</CardTitle>
+                          <CardDescription>使用量に基づいてリアルタイムで料金を計算します</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <FeeSimulator selectedPlanId="1" />
                         </CardContent>
                       </Card>
                     </TabsContent>

@@ -331,6 +331,72 @@ export const mockAdminDeviceApi = {
   },
 };
 
+export const mockFeeApi = {
+  calculateFee: async (data: any): Promise<ApiResponse<any>> => {
+    await delay(300 + Math.random() * 500);
+    
+    const plans = getStoredDataTyped(STORAGE_KEYS.PLANS, mockPlans);
+    const plan = plans.find(p => p.id === data.planId);
+    if (!plan) {
+      throw createMockError('プランが見つかりません', 404);
+    }
+
+    const baseFee = plan.monthlyFee;
+    const callFee = data.callMinutes * 22;
+    const dataFee = Math.max(0, (data.dataUsage - 20) * 550);
+    const smsFee = data.smsCount * 3.3;
+    
+    const totalFee = baseFee + callFee + dataFee + smsFee;
+    const taxIncluded = Math.round(totalFee * 1.1);
+
+    const result = {
+      totalFee,
+      breakdown: {
+        baseFee,
+        callFee: callFee + smsFee,
+        dataFee,
+        optionFees: [],
+        discounts: []
+      },
+      taxIncluded
+    };
+
+    return createMockResponse(result);
+  },
+
+  compareFeePlans: async (usage: any, planIds: string[]): Promise<ApiResponse<{ results: any[] }>> => {
+    await delay(400 + Math.random() * 600);
+    
+    const plans = getStoredDataTyped(STORAGE_KEYS.PLANS, mockPlans);
+    const results = planIds.map(planId => {
+      const plan = plans.find(p => p.id === planId);
+      if (!plan) return null;
+
+      const baseFee = plan.monthlyFee;
+      const callFee = usage.callMinutes * 22;
+      const dataFee = Math.max(0, (usage.dataUsage - 20) * 550);
+      const smsFee = usage.smsCount * 3.3;
+      
+      const totalFee = baseFee + callFee + dataFee + smsFee;
+      const taxIncluded = Math.round(totalFee * 1.1);
+
+      return {
+        totalFee,
+        breakdown: {
+          baseFee,
+          callFee: callFee + smsFee,
+          dataFee,
+          optionFees: [],
+          discounts: []
+        },
+        taxIncluded
+      };
+    }).filter(Boolean);
+
+    return createMockResponse({ results });
+  }
+};
+
 export const initializeMockData = () => {
   if (!localStorage.getItem(STORAGE_KEYS.PLANS)) {
     setStoredData(STORAGE_KEYS.PLANS, mockPlans);
