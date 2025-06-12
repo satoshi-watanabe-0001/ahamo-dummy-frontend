@@ -4,9 +4,12 @@ import { useState, useEffect } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
+import { SaveStatus } from '../ui/save-status';
+import { RestoreDialog } from '../ui/restore-dialog';
 import { personalInfoSchema, PersonalInfoFormData } from '../../schemas/personalInfoSchema';
 import { addressApi } from '../../utils/addressApi';
-import { secureStorage } from '../../utils/secureStorage';
+import { useFormPersistence } from '../../hooks/useFormPersistence';
+import { useSessionRestore } from '../../hooks/useSessionRestore';
 import { useDebounce } from '../../hooks/useDebounce';
 import { toast } from '../../hooks/use-toast';
 
@@ -18,9 +21,52 @@ interface PersonalInfoFormProps {
 export const PersonalInfoForm = ({ onSubmit, onSave }: PersonalInfoFormProps) => {
   const [isAddressLoading, setIsAddressLoading] = useState(false);
   
-  const { register, handleSubmit, formState: { errors }, setValue, watch, trigger } = useForm<PersonalInfoFormData>({
+  const {
+    saveStatus,
+    lastSavedTime,
+    updateFormData,
+    manualSave,
+    clearData,
+    loadData
+  } = useFormPersistence({
+    formId: 'personal-info',
+    onSave,
+    onRestore: (data) => {
+      Object.keys(data).forEach(key => {
+        setValue(key as keyof PersonalInfoFormData, data[key]);
+      });
+    }
+  });
+
+  const {
+    showRestoreDialog,
+    handleRestore,
+    handleStartFresh,
+    closeDialog
+  } = useSessionRestore({
+    onRestore: (data) => {
+      Object.keys(data).forEach(key => {
+        setValue(key as keyof PersonalInfoFormData, data[key]);
+      });
+      toast({
+        title: 'データを復元しました',
+        description: '前回の入力内容を復元しました',
+        severity: 'INFO'
+      });
+    },
+    onStartFresh: () => {
+      reset();
+      toast({
+        title: '新規作成',
+        description: '最初から入力を開始します',
+        severity: 'INFO'
+      });
+    }
+  });
+  
+  const { register, handleSubmit, formState: { errors }, setValue, watch, trigger, reset } = useForm<PersonalInfoFormData>({
     resolver: yupResolver(personalInfoSchema),
-    defaultValues: secureStorage.retrieve() || {}
+    defaultValues: loadData() || {}
   });
 
   const postalCode = watch('postalCode');
@@ -28,11 +74,11 @@ export const PersonalInfoForm = ({ onSubmit, onSave }: PersonalInfoFormProps) =>
 
   useEffect(() => {
     const subscription = watch((data) => {
-      secureStorage.store(data);
+      updateFormData(data);
       onSave?.(data as PersonalInfoFormData);
     });
     return () => subscription.unsubscribe();
-  }, [watch, onSave]);
+  }, [watch, onSave, updateFormData]);
 
   useEffect(() => {
     if (debouncedPostalCode && /^\d{3}-\d{4}$/.test(debouncedPostalCode)) {
@@ -58,17 +104,34 @@ export const PersonalInfoForm = ({ onSubmit, onSave }: PersonalInfoFormProps) =>
   }, [debouncedPostalCode, setValue, trigger]);
 
   const handleFormSubmit = (data: PersonalInfoFormData) => {
-    secureStorage.clear();
+    clearData();
     onSubmit(data);
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-sm">
-      <ProgressIndicator 
-        currentStep={1}
-        totalSteps={5}
-        steps={['個人情報', 'プラン選択', '本人確認', '決済', '完了']}
+    <>
+      <RestoreDialog
+        isOpen={showRestoreDialog}
+        onRestore={handleRestore}
+        onStartFresh={handleStartFresh}
+        onClose={closeDialog}
       />
+      
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-sm">
+        <ProgressIndicator 
+          currentStep={1}
+          totalSteps={5}
+          steps={['個人情報', 'プラン選択', '本人確認', '決済', '完了']}
+          showCompletionStatus={true}
+          completedSteps={[]}
+        />
+        
+        <SaveStatus
+          status={saveStatus}
+          onManualSave={manualSave}
+          lastSavedTime={lastSavedTime}
+          className="mb-6"
+        />
       
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -226,7 +289,7 @@ export const PersonalInfoForm = ({ onSubmit, onSave }: PersonalInfoFormProps) =>
         </div>
 
         <div className="flex justify-between pt-6">
-          <Button type="button" variant="outline" onClick={() => secureStorage.clear()}>
+          <Button type="button" variant="outline" onClick={clearData}>
             入力内容をクリア
           </Button>
           <Button type="submit">
@@ -235,5 +298,6 @@ export const PersonalInfoForm = ({ onSubmit, onSave }: PersonalInfoFormProps) =>
         </div>
       </form>
     </div>
+    </>
   );
 };
