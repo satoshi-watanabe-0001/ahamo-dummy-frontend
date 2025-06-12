@@ -37,7 +37,7 @@ export const MnpTransferForm: React.FC<MnpTransferFormProps> = ({
     if (result.valid && result.detectedCarrier) {
       setFormData(prev => ({
         ...prev,
-        fromCarrier: result.detectedCarrier
+        fromCarrier: result.detectedCarrier || ''
       }));
     }
   };
@@ -90,7 +90,7 @@ export const MnpTransferForm: React.FC<MnpTransferFormProps> = ({
                 placeholder="09012345678"
                 maxLength={11}
                 inputMode="tel"
-                aria-required="true"
+                aria-required={true}
                 className="font-mono"
               />
             </div>
@@ -117,7 +117,7 @@ export const MnpTransferForm: React.FC<MnpTransferFormProps> = ({
                 value={formData.contractId}
                 onChange={(e) => setFormData(prev => ({ ...prev, contractId: e.target.value }))}
                 placeholder="契約IDを入力してください"
-                aria-required="true"
+                aria-required={true}
               />
             </div>
 

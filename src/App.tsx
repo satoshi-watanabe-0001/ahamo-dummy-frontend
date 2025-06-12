@@ -14,6 +14,7 @@ import { DeviceCatalog } from './components/device/DeviceCatalog';
 import { DeviceDetail } from './components/organisms/DeviceDetail';
 import { DeviceComparisonPage } from './components/pages/DeviceComparisonPage';
 import { PersonalInfoForm } from './components/forms/PersonalInfoForm';
+import { MnpTransferForm } from './components/organisms/MnpTransferForm';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
@@ -144,12 +145,13 @@ function App() {
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Tabs コンポーネント</h3>
                   <Tabs defaultValue="plans" className="w-full">
-                    <TabsList className="grid w-full grid-cols-5">
+                    <TabsList className="grid w-full grid-cols-6">
                       <TabsTrigger value="plans">料金プラン</TabsTrigger>
                       <TabsTrigger value="simulator">料金シミュレーション</TabsTrigger>
                       <TabsTrigger value="devices">デバイス</TabsTrigger>
                       <TabsTrigger value="options">オプション</TabsTrigger>
                       <TabsTrigger value="personal-info">個人情報</TabsTrigger>
+                      <TabsTrigger value="mnp">MNP転入</TabsTrigger>
                     </TabsList>
                     <TabsContent value="plans" className="space-y-4">
                       <Card>
@@ -208,6 +210,22 @@ function App() {
                             }}
                             onSave={(data) => {
                               console.log('Form auto-saved:', data);
+                            }}
+                          />
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                    <TabsContent value="mnp" className="space-y-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>MNP転入申請</CardTitle>
+                          <CardDescription>SCRUM-54: MNP予約番号入力・検証機能付き転入申請フォーム</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <MnpTransferForm 
+                            onSubmit={(data) => {
+                              console.log('MNP Transfer submitted:', data);
+                              alert('MNP転入申請完了: ' + JSON.stringify(data, null, 2));
                             }}
                           />
                         </CardContent>
