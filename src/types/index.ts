@@ -75,6 +75,8 @@ export interface Device {
   imageUrl?: string;
   specifications?: string;
   galleryImages?: string[];
+  releaseDate: string;
+  popularity: number;
   createdBy?: string;
   updatedBy?: string;
   createdAt?: string;
