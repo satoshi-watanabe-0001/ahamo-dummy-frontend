@@ -1,5 +1,5 @@
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080';
-const USE_MOCK_API = (import.meta as any).env?.VITE_USE_MOCK_API === 'true';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '';
+const USE_MOCK_API = true;
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -37,7 +37,7 @@ class ApiClient {
     
     while (true) {
       try {
-        const url = `${this.baseURL}${endpoint}`;
+        const url = this.baseURL ? `${this.baseURL}${endpoint}` : endpoint;
         
         const defaultHeaders = {
           'Content-Type': 'application/json',
@@ -140,6 +140,7 @@ import {
   mockPlanApi, 
   mockDeviceApi, 
   mockAdminDeviceApi,
+  mockFeeApi,
   initializeMockData 
 } from './mockApi';
 
@@ -160,6 +161,13 @@ export const contractApi = USE_MOCK_API ? mockContractApi : {
 export const planApi = USE_MOCK_API ? mockPlanApi : {
   getPlans: () => apiClient.get('/api/v1/plans'),
   getPlan: (id: string) => apiClient.get(`/api/v1/plans/${id}`),
+};
+
+export const feeApi = USE_MOCK_API ? mockFeeApi : {
+  calculateFee: (data: any) => 
+    apiClient.post('/api/calculate-fee', data),
+  compareFeePlans: (usage: any, planIds: string[]) => 
+    apiClient.post('/api/compare-fee-plans', { usage, planIds }),
 };
 
 export const deviceApi = USE_MOCK_API ? mockDeviceApi : {

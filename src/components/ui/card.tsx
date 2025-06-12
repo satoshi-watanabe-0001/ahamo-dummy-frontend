@@ -1,11 +1,13 @@
 interface CardProps {
   children?: any;
   className?: string;
+  onClick?: () => void;
 }
 
-export const Card = ({ children, className, ...props }: CardProps) => (
+export const Card = ({ children, className, onClick, ...props }: CardProps) => (
   <div
     className={`rounded-lg border border-gray-200 bg-white shadow-sm ${className || ''}`}
+    onClick={onClick}
     {...props}
   >
     {children}
