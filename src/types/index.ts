@@ -125,6 +125,22 @@ export interface ResponsiveProps {
 
 export * from './accessibility';
 
+export interface Option {
+  id: string;
+  name: string;
+  category: 'insurance' | 'accessory' | 'service';
+  description: string;
+  monthlyFee: number;
+  oneTimeFee: number;
+  isActive: boolean;
+  requiredOptions?: string[];
+  excludedOptions?: string[];
+}
+
+export interface FeeCalculationRequestWithOptions extends FeeCalculationRequest {
+  selectedOptionIds?: string[];
+}
+
 export type ComponentSize = 'sm' | 'md' | 'lg';
 export type ComponentVariant = 'default' | 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost';
 export type ComponentState = 'default' | 'hover' | 'active' | 'disabled' | 'loading';

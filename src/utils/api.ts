@@ -141,6 +141,7 @@ import {
   mockDeviceApi, 
   mockAdminDeviceApi,
   mockFeeApi,
+  mockOptionApi,
   initializeMockData 
 } from './mockApi';
 
@@ -166,6 +167,8 @@ export const planApi = USE_MOCK_API ? mockPlanApi : {
 export const feeApi = USE_MOCK_API ? mockFeeApi : {
   calculateFee: (data: any) => 
     apiClient.post('/api/calculate-fee', data),
+  calculateTotal: (data: any) => 
+    apiClient.post('/api/calculate-total', data),
   compareFeePlans: (usage: any, planIds: string[]) => 
     apiClient.post('/api/compare-fee-plans', { usage, planIds }),
 };
@@ -198,6 +201,11 @@ export const adminDeviceApi = USE_MOCK_API ? mockAdminDeviceApi : {
       body: formData,
     });
   },
+};
+
+export const optionApi = USE_MOCK_API ? mockOptionApi : {
+  getOptions: (category?: string) => 
+    apiClient.get(`/api/options${category ? `?category=${category}` : ''}`),
 };
 
 export default apiClient;
