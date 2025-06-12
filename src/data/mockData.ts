@@ -83,14 +83,16 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/iphone15pro_1.jpg',
       'https://example.com/iphone15pro_2.jpg'
-    ]
+    ],
+    releaseDate: '2023-09-22',
+    popularity: 5
   },
   {
     id: '2',
     name: 'iPhone 15',
     brand: 'Apple',
     category: 'iPhone',
-    priceRange: 'mid',
+    priceRange: 'premium',
     price: 124800,
     colors: ['ピンク', 'イエロー', 'グリーン', 'ブルー', 'ブラック'],
     storageOptions: ['128GB', '256GB', '512GB'],
@@ -107,7 +109,9 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/iphone15_1.jpg',
       'https://example.com/iphone15_2.jpg'
-    ]
+    ],
+    releaseDate: '2023-09-22',
+    popularity: 4
   },
   {
     id: '3',
@@ -132,14 +136,16 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/galaxys24ultra_1.jpg',
       'https://example.com/galaxys24ultra_2.jpg'
-    ]
+    ],
+    releaseDate: '2024-01-17',
+    popularity: 5
   },
   {
     id: '4',
     name: 'Galaxy S24',
     brand: 'Samsung',
     category: 'Android',
-    priceRange: 'mid',
+    priceRange: 'premium',
     price: 124700,
     colors: ['オニキスブラック', 'マーブルグレー', 'コバルトバイオレット'],
     storageOptions: ['256GB', '512GB'],
@@ -156,7 +162,9 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/galaxys24_1.jpg',
       'https://example.com/galaxys24_2.jpg'
-    ]
+    ],
+    releaseDate: '2024-01-17',
+    popularity: 4
   },
   {
     id: '5',
@@ -181,14 +189,16 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/xperia1vi_1.jpg',
       'https://example.com/xperia1vi_2.jpg'
-    ]
+    ],
+    releaseDate: '2024-06-07',
+    popularity: 3
   },
   {
     id: '6',
     name: 'AQUOS sense8',
     brand: 'Sharp',
     category: 'Android',
-    priceRange: 'entry',
+    priceRange: 'mid',
     price: 62700,
     colors: ['ライトカッパー', 'ペールグリーン', 'コバルトブラック'],
     storageOptions: ['128GB'],
@@ -206,14 +216,16 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/aquossense8_1.jpg',
       'https://example.com/aquossense8_2.jpg'
-    ]
+    ],
+    releaseDate: '2023-11-09',
+    popularity: 3
   },
   {
     id: '7',
     name: 'iPhone SE (第3世代)',
     brand: 'Apple',
     category: 'iPhone',
-    priceRange: 'entry',
+    priceRange: 'mid',
     price: 62800,
     colors: ['ミッドナイト', 'スターライト', '(PRODUCT)RED'],
     storageOptions: ['64GB', '128GB', '256GB'],
@@ -230,7 +242,9 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/iphonese3_1.jpg',
       'https://example.com/iphonese3_2.jpg'
-    ]
+    ],
+    releaseDate: '2022-03-18',
+    popularity: 3
   },
   {
     id: '8',
@@ -238,7 +252,7 @@ export const mockDevices: Device[] = [
     brand: 'Google',
     category: 'Android',
     priceRange: 'premium',
-    price: 159800,
+    price: 159000,
     colors: ['オブシディアン', 'ポーセリン', 'ベイ'],
     storageOptions: ['128GB', '256GB', '512GB'],
     inStock: true,
@@ -255,14 +269,16 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/pixel8pro_1.jpg',
       'https://example.com/pixel8pro_2.jpg'
-    ]
+    ],
+    releaseDate: '2023-10-12',
+    popularity: 4
   },
   {
     id: '9',
     name: 'Pixel 8',
     brand: 'Google',
     category: 'Android',
-    priceRange: 'mid',
+    priceRange: 'premium',
     price: 112900,
     colors: ['オブシディアン', 'ヘーゼル', 'ローズ'],
     storageOptions: ['128GB', '256GB'],
@@ -280,18 +296,20 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/pixel8_1.jpg',
       'https://example.com/pixel8_2.jpg'
-    ]
+    ],
+    releaseDate: '2023-10-12',
+    popularity: 3
   },
   {
     id: '10',
     name: 'arrows N',
     brand: 'FCNT',
     category: 'Android',
-    priceRange: 'entry',
+    priceRange: 'mid',
     price: 98780,
     colors: ['フォグホワイト', 'フォレストブラック'],
     storageOptions: ['128GB'],
-    inStock: true,
+    inStock: false,
     imageUrl: 'https://example.com/arrowsn.jpg',
     specifications: JSON.stringify({
       display: '6.24インチ有機EL',
@@ -305,7 +323,259 @@ export const mockDevices: Device[] = [
     galleryImages: [
       'https://example.com/arrowsn_1.jpg',
       'https://example.com/arrowsn_2.jpg'
-    ]
+    ],
+    releaseDate: '2023-02-09',
+    popularity: 2
+  },
+  {
+    id: '11',
+    name: 'Xiaomi 14',
+    brand: 'Xiaomi',
+    category: 'Android',
+    priceRange: 'premium',
+    price: 119800,
+    colors: ['ブラック', 'ホワイト', 'グリーン'],
+    storageOptions: ['256GB', '512GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/xiaomi14.jpg',
+    specifications: JSON.stringify({
+      display: '6.36インチ AMOLED',
+      chip: 'Snapdragon 8 Gen 3',
+      camera: 'Leica 50MPトリプルカメラ',
+      battery: '4610mAh',
+      storage: '256GB〜512GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/xiaomi14_1.jpg'
+    ],
+    releaseDate: '2024-02-25',
+    popularity: 4
+  },
+  {
+    id: '12',
+    name: 'OnePlus 12',
+    brand: 'OnePlus',
+    category: 'Android',
+    priceRange: 'premium',
+    price: 134800,
+    colors: ['シルキーブラック', 'フローラルグリーン'],
+    storageOptions: ['256GB', '512GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/oneplus12.jpg',
+    specifications: JSON.stringify({
+      display: '6.82インチ LTPO AMOLED',
+      chip: 'Snapdragon 8 Gen 3',
+      camera: 'Hasselblad 50MPトリプルカメラ',
+      battery: '5400mAh',
+      storage: '256GB〜512GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/oneplus12_1.jpg'
+    ],
+    releaseDate: '2024-01-23',
+    popularity: 3
+  },
+  {
+    id: '13',
+    name: 'OPPO Reno11 A',
+    brand: 'OPPO',
+    category: 'Android',
+    priceRange: 'mid',
+    price: 48800,
+    colors: ['ムーンホワイト', 'コーラルパープル'],
+    storageOptions: ['128GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/opporeno11a.jpg',
+    specifications: JSON.stringify({
+      display: '6.7インチ AMOLED',
+      chip: 'MediaTek Dimensity 7050',
+      camera: '64MP AIトリプルカメラ',
+      battery: '5000mAh',
+      storage: '128GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/opporeno11a_1.jpg'
+    ],
+    releaseDate: '2024-06-27',
+    popularity: 3
+  },
+  {
+    id: '14',
+    name: 'Nothing Phone (2a)',
+    brand: 'Nothing',
+    category: 'Android',
+    priceRange: 'mid',
+    price: 54800,
+    colors: ['ブラック', 'ホワイト'],
+    storageOptions: ['128GB', '256GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/nothingphone2a.jpg',
+    specifications: JSON.stringify({
+      display: '6.7インチ AMOLED',
+      chip: 'MediaTek Dimensity 7200 Pro',
+      camera: '50MPデュアルカメラ',
+      battery: '5000mAh',
+      storage: '128GB〜256GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/nothingphone2a_1.jpg'
+    ],
+    releaseDate: '2024-03-05',
+    popularity: 2
+  },
+  {
+    id: '15',
+    name: 'Redmi Note 13 Pro 5G',
+    brand: 'Xiaomi',
+    category: 'Android',
+    priceRange: 'entry',
+    price: 39800,
+    colors: ['ミッドナイトブラック', 'オーロラパープル', 'フォレストグリーン'],
+    storageOptions: ['128GB', '256GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/redminote13pro.jpg',
+    specifications: JSON.stringify({
+      display: '6.67インチ AMOLED',
+      chip: 'Snapdragon 7s Gen 2',
+      camera: '200MPトリプルカメラ',
+      battery: '5100mAh',
+      storage: '128GB〜256GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/redminote13pro_1.jpg'
+    ],
+    releaseDate: '2024-05-16',
+    popularity: 4
+  },
+  {
+    id: '16',
+    name: 'moto g64 5G',
+    brand: 'Motorola',
+    category: 'Android',
+    priceRange: 'entry',
+    price: 32800,
+    colors: ['アイスリリー', 'ミントグリーン', 'パープル'],
+    storageOptions: ['128GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/motog64.jpg',
+    specifications: JSON.stringify({
+      display: '6.5インチ IPS LCD',
+      chip: 'MediaTek Dimensity 7025',
+      camera: '50MPデュアルカメラ',
+      battery: '6000mAh',
+      storage: '128GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/motog64_1.jpg'
+    ],
+    releaseDate: '2024-04-04',
+    popularity: 3
+  },
+  {
+    id: '17',
+    name: 'AQUOS R8 pro',
+    brand: 'Sharp',
+    category: 'Android',
+    priceRange: 'premium',
+    price: 191900,
+    colors: ['ブラック', 'ホワイト'],
+    storageOptions: ['256GB'],
+    inStock: false,
+    imageUrl: 'https://example.com/aquosr8pro.jpg',
+    specifications: JSON.stringify({
+      display: '6.6インチ Pro IGZO OLED',
+      chip: 'Snapdragon 8 Gen 2',
+      camera: 'Leica監修 47.2MPカメラ',
+      battery: '5000mAh',
+      storage: '256GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/aquosr8pro_1.jpg'
+    ],
+    releaseDate: '2023-07-20',
+    popularity: 2
+  },
+  {
+    id: '18',
+    name: 'Galaxy A55 5G',
+    brand: 'Samsung',
+    category: 'Android',
+    priceRange: 'mid',
+    price: 69300,
+    colors: ['オーサムアイスブルー', 'オーサムライラック', 'オーサムネイビー'],
+    storageOptions: ['128GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/galaxya55.jpg',
+    specifications: JSON.stringify({
+      display: '6.6インチ Super AMOLED',
+      chip: 'Exynos 1480',
+      camera: '50MPトリプルカメラ',
+      battery: '5000mAh',
+      storage: '128GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/galaxya55_1.jpg'
+    ],
+    releaseDate: '2024-05-30',
+    popularity: 3
+  },
+  {
+    id: '19',
+    name: 'Xperia 10 VI',
+    brand: 'Sony',
+    category: 'Android',
+    priceRange: 'mid',
+    price: 67100,
+    colors: ['ブラック', 'ホワイト', 'ブルー', 'イエロー'],
+    storageOptions: ['128GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/xperia10vi.jpg',
+    specifications: JSON.stringify({
+      display: '6.1インチ OLED',
+      chip: 'Snapdragon 6 Gen 1',
+      camera: '48MPトリプルカメラ',
+      battery: '5000mAh',
+      storage: '128GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/xperia10vi_1.jpg'
+    ],
+    releaseDate: '2024-07-05',
+    popularity: 2
+  },
+  {
+    id: '20',
+    name: 'iPhone 14',
+    brand: 'Apple',
+    category: 'iPhone',
+    priceRange: 'premium',
+    price: 112800,
+    colors: ['ブルー', 'パープル', 'ミッドナイト', 'スターライト', '(PRODUCT)RED'],
+    storageOptions: ['128GB', '256GB', '512GB'],
+    inStock: true,
+    imageUrl: 'https://example.com/iphone14.jpg',
+    specifications: JSON.stringify({
+      display: '6.1インチ Super Retina XDR',
+      chip: 'A15 Bionic',
+      camera: 'デュアル12MPカメラシステム',
+      battery: 'ビデオ再生最大20時間',
+      storage: '128GB〜512GB',
+      connectivity: '5G対応'
+    }),
+    galleryImages: [
+      'https://example.com/iphone14_1.jpg'
+    ],
+    releaseDate: '2022-09-16',
+    popularity: 4
   }
 ];
 

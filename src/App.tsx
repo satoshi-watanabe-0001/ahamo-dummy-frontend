@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 import { HighContrastToggle } from './components/ui/high-contrast-toggle';
 import { PlanComparison } from './components/organisms/PlanComparison';
 import { FeeSimulator } from './components/organisms/FeeSimulator';
+import { DeviceCatalog } from './components/device/DeviceCatalog';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
@@ -144,15 +145,7 @@ function App() {
                       </Card>
                     </TabsContent>
                     <TabsContent value="devices" className="space-y-4">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>デバイス選択</CardTitle>
-                          <CardDescription>最新のスマートフォンをご用意しています</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <p>iPhone、Android端末を豊富に取り揃えています。</p>
-                        </CardContent>
-                      </Card>
+                      <DeviceCatalog />
                     </TabsContent>
                     <TabsContent value="options" className="space-y-4">
                       <Card>
