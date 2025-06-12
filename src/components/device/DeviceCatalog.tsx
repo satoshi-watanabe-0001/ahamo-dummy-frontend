@@ -7,9 +7,10 @@ import { DeviceSort, SortOption } from './DeviceSort';
 
 interface DeviceCatalogProps {
   className?: string;
+  onDeviceSelect?: (deviceId: string) => void;
 }
 
-export function DeviceCatalog({ className }: DeviceCatalogProps) {
+export function DeviceCatalog({ className, onDeviceSelect }: DeviceCatalogProps) {
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
@@ -114,7 +115,7 @@ export function DeviceCatalog({ className }: DeviceCatalogProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredAndSortedDevices.map((device) => (
-            <DeviceCard key={device.id} device={device} />
+            <DeviceCard key={device.id} device={device} onClick={() => onDeviceSelect?.(device.id)} />
           ))}
         </div>
       )}

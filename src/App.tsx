@@ -10,9 +10,27 @@ import { HighContrastToggle } from './components/ui/high-contrast-toggle';
 import { PlanComparison } from './components/organisms/PlanComparison';
 import { FeeSimulator } from './components/organisms/FeeSimulator';
 import { DeviceCatalog } from './components/device/DeviceCatalog';
+import { DeviceDetail } from './components/organisms/DeviceDetail';
+import { DeviceComparisonPage } from './components/pages/DeviceComparisonPage';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
+  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison'>('demo');
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+
+  const handleDeviceSelect = (deviceId: string) => {
+    setSelectedDeviceId(deviceId);
+    setCurrentView('device-detail');
+  };
+
+  const handleBackToDemo = () => {
+    setCurrentView('demo');
+    setSelectedDeviceId(null);
+  };
+
+  const handleShowComparison = () => {
+    setCurrentView('device-comparison');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -37,6 +55,14 @@ function App() {
       
       {showAdmin ? (
         <AdminDeviceApp />
+      ) : currentView === 'device-detail' && selectedDeviceId ? (
+        <DeviceDetail
+          deviceId={selectedDeviceId}
+          onBack={handleBackToDemo}
+          onShowComparison={handleShowComparison}
+        />
+      ) : currentView === 'device-comparison' ? (
+        <DeviceComparisonPage onBack={handleBackToDemo} />
       ) : (
         <DemoLayout 
           title="Ahamo UI Component Library" 
@@ -145,7 +171,7 @@ function App() {
                       </Card>
                     </TabsContent>
                     <TabsContent value="devices" className="space-y-4">
-                      <DeviceCatalog />
+                      <DeviceCatalog onDeviceSelect={handleDeviceSelect} />
                     </TabsContent>
                     <TabsContent value="options" className="space-y-4">
                       <Card>

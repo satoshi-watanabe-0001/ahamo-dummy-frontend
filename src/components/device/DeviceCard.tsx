@@ -4,13 +4,17 @@ import { Badge } from '../ui/badge';
 
 interface DeviceCardProps {
   device: Device;
+  onClick?: () => void;
 }
 
-export function DeviceCard({ device }: DeviceCardProps) {
+export function DeviceCard({ device, onClick }: DeviceCardProps) {
   const specs = device.specifications ? JSON.parse(device.specifications) : {};
   
   return (
-    <Card className={`transition-all duration-200 ${!device.inStock ? 'opacity-60 grayscale' : ''}`}>
+    <Card 
+      className={`transition-all duration-200 cursor-pointer hover:shadow-md ${!device.inStock ? 'opacity-60 grayscale' : ''}`}
+      onClick={onClick}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-bold">{device.name}</CardTitle>

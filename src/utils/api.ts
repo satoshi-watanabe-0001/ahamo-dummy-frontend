@@ -173,6 +173,7 @@ export const feeApi = USE_MOCK_API ? mockFeeApi : {
 export const deviceApi = USE_MOCK_API ? mockDeviceApi : {
   getDevices: () => apiClient.get('/api/devices'),
   getDevice: (id: string) => apiClient.get(`/api/devices/${id}`),
+  getInventory: (id: string) => apiClient.get(`/api/devices/${id}/inventory`),
 };
 
 export const adminDeviceApi = USE_MOCK_API ? mockAdminDeviceApi : {
