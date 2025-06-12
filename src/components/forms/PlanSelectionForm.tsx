@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
 import { SaveStatus } from '../ui/save-status';
@@ -96,7 +96,7 @@ export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFor
     }
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<PlanSelectionFormData>({
+  const { register, handleSubmit, setValue, watch, reset } = useForm<PlanSelectionFormData>({
     defaultValues: loadData() || {
       selectedPlanId: '',
       selectedOptions: [],
@@ -106,7 +106,6 @@ export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFor
 
   const selectedPlanId = watch('selectedPlanId');
   const selectedOptions = watch('selectedOptions');
-  const contractType = watch('contractType');
 
   useEffect(() => {
     const subscription = watch((data) => {

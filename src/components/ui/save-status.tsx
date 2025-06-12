@@ -6,7 +6,7 @@ export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 interface SaveStatusProps {
   status: SaveStatus;
   onManualSave?: () => void;
-  lastSavedTime?: Date;
+  lastSavedTime?: Date | null;
   className?: string;
 }
 

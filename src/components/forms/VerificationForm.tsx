@@ -83,7 +83,7 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
     }
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<VerificationFormData>({
+  const { register, handleSubmit, setValue, watch, reset } = useForm<VerificationFormData>({
     defaultValues: loadData() || {
       documentType: 'license',
       documentNumber: '',
@@ -92,8 +92,7 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
     }
   });
 
-  const documentType = watch('documentType');
-  const documentNumber = watch('documentNumber');
+
   const verificationCode = watch('verificationCode');
   const isVerified = watch('isVerified');
 
@@ -259,7 +258,7 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
                 <div className="mb-4">
                   <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
                     verificationStep === 'document' ? 'bg-blue-100 text-blue-600' :
-                    verificationStep !== 'document' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                    verificationStep === 'complete' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
                   }`}>
                     {verificationStep !== 'document' ? '✓' : '1'}
                   </div>
