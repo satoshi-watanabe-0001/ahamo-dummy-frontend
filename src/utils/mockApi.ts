@@ -361,6 +361,53 @@ export const mockAdminDeviceApi = {
   },
 };
 
+const mockOptions = [
+  {
+    id: 'option_insurance_001',
+    name: 'ケータイ補償サービス',
+    category: 'insurance',
+    description: '故障・水濡れ・盗難・紛失などのトラブル時にサポート',
+    monthlyFee: 825,
+    oneTimeFee: 0,
+    isActive: true,
+    requiredOptions: [],
+    excludedOptions: ['option_insurance_002']
+  },
+  {
+    id: 'option_insurance_002',
+    name: 'AppleCare+ for iPhone',
+    category: 'insurance',
+    description: 'Apple公式の保証サービス',
+    monthlyFee: 1180,
+    oneTimeFee: 0,
+    isActive: true,
+    requiredOptions: [],
+    excludedOptions: ['option_insurance_001']
+  },
+  {
+    id: 'option_accessory_001',
+    name: 'ワイヤレス充電器',
+    category: 'accessory',
+    description: 'Qi対応ワイヤレス充電器',
+    monthlyFee: 0,
+    oneTimeFee: 3300,
+    isActive: true,
+    requiredOptions: [],
+    excludedOptions: []
+  },
+  {
+    id: 'option_service_001',
+    name: '国際ローミング',
+    category: 'service',
+    description: '海外でもデータ通信・通話が可能',
+    monthlyFee: 980,
+    oneTimeFee: 0,
+    isActive: true,
+    requiredOptions: [],
+    excludedOptions: []
+  }
+];
+
 export const mockFeeApi = {
   calculateFee: async (data: any): Promise<ApiResponse<any>> => {
     await delay(300 + Math.random() * 500);
@@ -376,7 +423,20 @@ export const mockFeeApi = {
     const dataFee = Math.max(0, (data.dataUsage - 20) * 550);
     const smsFee = data.smsCount * 3.3;
     
-    const totalFee = baseFee + callFee + dataFee + smsFee;
+    let optionFees: any[] = [];
+    if (data.selectedOptionIds && data.selectedOptionIds.length > 0) {
+      optionFees = data.selectedOptionIds.map((optionId: string) => {
+        const option = mockOptions.find(o => o.id === optionId);
+        return option ? {
+          id: option.id,
+          name: option.name,
+          fee: option.monthlyFee
+        } : null;
+      }).filter(Boolean);
+    }
+    
+    const totalOptionFees = optionFees.reduce((sum, option) => sum + option.fee, 0);
+    const totalFee = baseFee + callFee + dataFee + smsFee + totalOptionFees;
     const taxIncluded = Math.round(totalFee * 1.1);
 
     const result = {
@@ -385,13 +445,17 @@ export const mockFeeApi = {
         baseFee,
         callFee: callFee + smsFee,
         dataFee,
-        optionFees: [],
+        optionFees,
         discounts: []
       },
       taxIncluded
     };
 
     return createMockResponse(result);
+  },
+
+  calculateTotal: async (data: any): Promise<ApiResponse<any>> => {
+    return mockFeeApi.calculateFee(data);
   },
 
   compareFeePlans: async (usage: any, planIds: string[]): Promise<ApiResponse<{ results: any[] }>> => {
@@ -424,6 +488,22 @@ export const mockFeeApi = {
     }).filter(Boolean);
 
     return createMockResponse({ results });
+  }
+};
+
+export const mockOptionApi = {
+  getOptions: async (category?: string): Promise<ApiResponse<any>> => {
+    await delay(200 + Math.random() * 300);
+    
+    let filteredOptions = mockOptions;
+    if (category) {
+      filteredOptions = mockOptions.filter(option => option.category === category);
+    }
+    
+    return createMockResponse({
+      options: filteredOptions,
+      total: filteredOptions.length
+    });
   }
 };
 

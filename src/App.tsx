@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AdminDeviceApp } from './components/admin/AdminDeviceApp';
 import DemoLayout from './components/templates/DemoLayout';
 import ComponentShowcase from './components/templates/ComponentShowcase';
+import { OptionManager } from './components/organisms/OptionManager';
 import { Button } from './components/atoms';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './components/molecules';
 import { Badge } from './components/ui/badge';
@@ -177,10 +178,17 @@ function App() {
                       <Card>
                         <CardHeader>
                           <CardTitle>オプションサービス</CardTitle>
-                          <CardDescription>便利なオプションサービス</CardDescription>
+                          <CardDescription>便利なオプションサービスを選択してください</CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <p>かけ放題オプション、ケータイ補償サービスなど。</p>
+                          <OptionManager 
+                            selectedPlanId="plan_standard_001"
+                            baseUsage={{
+                              dataUsage: 15,
+                              callMinutes: 120,
+                              smsCount: 20
+                            }}
+                          />
                         </CardContent>
                       </Card>
                     </TabsContent>
