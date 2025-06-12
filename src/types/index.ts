@@ -141,6 +141,21 @@ export interface FeeCalculationRequestWithOptions extends FeeCalculationRequest 
   selectedOptionIds?: string[];
 }
 
+export interface PersonalInfo {
+  nameKanji: string;
+  nameKana: string;
+  birthDate: string;
+  gender: 'male' | 'female' | 'other';
+  postalCode: string;
+  prefecture: string;
+  city: string;
+  addressLine1: string;
+  addressLine2?: string;
+  building?: string;
+  phone: string;
+  email: string;
+}
+
 export type ComponentSize = 'sm' | 'md' | 'lg';
 export type ComponentVariant = 'default' | 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost';
 export type ComponentState = 'default' | 'hover' | 'active' | 'disabled' | 'loading';
