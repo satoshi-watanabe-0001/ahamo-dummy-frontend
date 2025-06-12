@@ -182,7 +182,7 @@ function App() {
                         </CardHeader>
                         <CardContent>
                           <OptionManager 
-                            selectedPlanId="plan_standard_001"
+                            selectedPlanId="1"
                             baseUsage={{
                               dataUsage: 15,
                               callMinutes: 120,
