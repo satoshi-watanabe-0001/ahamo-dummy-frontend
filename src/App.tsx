@@ -13,6 +13,7 @@ import { FeeSimulator } from './components/organisms/FeeSimulator';
 import { DeviceCatalog } from './components/device/DeviceCatalog';
 import { DeviceDetail } from './components/organisms/DeviceDetail';
 import { DeviceComparisonPage } from './components/pages/DeviceComparisonPage';
+import { PersonalInfoForm } from './components/forms/PersonalInfoForm';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
@@ -143,11 +144,12 @@ function App() {
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Tabs コンポーネント</h3>
                   <Tabs defaultValue="plans" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-5">
                       <TabsTrigger value="plans">料金プラン</TabsTrigger>
                       <TabsTrigger value="simulator">料金シミュレーション</TabsTrigger>
                       <TabsTrigger value="devices">デバイス</TabsTrigger>
                       <TabsTrigger value="options">オプション</TabsTrigger>
+                      <TabsTrigger value="personal-info">個人情報</TabsTrigger>
                     </TabsList>
                     <TabsContent value="plans" className="space-y-4">
                       <Card>
@@ -187,6 +189,25 @@ function App() {
                               dataUsage: 15,
                               callMinutes: 120,
                               smsCount: 20
+                            }}
+                          />
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                    <TabsContent value="personal-info" className="space-y-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>個人情報入力フォーム</CardTitle>
+                          <CardDescription>SCRUM-53: リアルタイムバリデーション・住所自動補完機能付き</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <PersonalInfoForm 
+                            onSubmit={(data) => {
+                              console.log('Form submitted:', data);
+                              alert('フォーム送信完了: ' + JSON.stringify(data, null, 2));
+                            }}
+                            onSave={(data) => {
+                              console.log('Form auto-saved:', data);
                             }}
                           />
                         </CardContent>
