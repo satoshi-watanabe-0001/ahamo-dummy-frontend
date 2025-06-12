@@ -1,17 +1,14 @@
 import '@testing-library/jest-dom'
 import { configure } from '@testing-library/react'
-import { expect, vi } from 'vitest'
 import { toHaveNoViolations } from 'jest-axe'
 
 configure({ testIdAttribute: 'data-testid' })
 
-expect.extend({
-  toHaveNoViolations: toHaveNoViolations as any
-})
+expect.extend({ toHaveNoViolations })
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -36,6 +33,6 @@ Object.defineProperty(globalThis, 'CSS', {
   writable: true,
   value: {
     supports: vi.fn(() => false),
-    escape: vi.fn((str) => str),
+    escape: vi.fn((str: string) => str),
   },
 })

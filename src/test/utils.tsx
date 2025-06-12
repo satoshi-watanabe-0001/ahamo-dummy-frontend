@@ -6,10 +6,19 @@ const customRender = (
   options?: Omit<RenderOptions, 'wrapper'>
 ) => render(ui, { ...options })
 
-export const testAccessibility = async (_container: HTMLElement) => {
-  // const results = await axe(container)
-  // expect(results).toHaveNoViolations()
-  console.log('アクセシビリティテストは一時的に無効化されています')
+export const testAccessibility = async (container: HTMLElement) => {
+  const { axe } = await import('jest-axe')
+  const results = await axe(container)
+  
+  if (results.violations.length > 0) {
+    const violationMessages = results.violations.map((violation: any) => {
+      return `${violation.id}: ${violation.description}\n  - ${violation.nodes.map((node: any) => node.target).join('\n  - ')}`
+    }).join('\n\n')
+    
+    throw new Error(`アクセシビリティ違反が検出されました:\n\n${violationMessages}`)
+  }
+  
+  expect(results.violations).toHaveLength(0)
 }
 
 export const createMockPlan = (overrides = {}) => ({
