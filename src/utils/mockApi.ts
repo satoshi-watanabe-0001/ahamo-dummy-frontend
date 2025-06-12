@@ -68,6 +68,24 @@ class MockApiClient {
       return createMockResponse({ devices, total: devices.length } as T);
     }
     
+    if (endpoint.startsWith('/api/devices/') && endpoint.endsWith('/inventory')) {
+      const id = endpoint.split('/')[3];
+      const devices = getStoredDataTyped(STORAGE_KEYS.DEVICES, mockDevices);
+      const device = devices.find(d => d.id === id);
+      if (!device) {
+        throw createMockError('デバイスが見つかりません', 404);
+      }
+      const inventory = device.colors?.map(color => ({
+        color,
+        storageOptions: device.storageOptions?.map(storage => ({
+          storage,
+          inStock: Math.random() > 0.3,
+          quantity: Math.floor(Math.random() * 10)
+        })) || []
+      })) || [];
+      return createMockResponse({ inventory } as T);
+    }
+
     if (endpoint.startsWith('/api/devices/')) {
       const id = endpoint.split('/').pop();
       const devices = getStoredDataTyped(STORAGE_KEYS.DEVICES, mockDevices);
@@ -224,6 +242,7 @@ export const mockPlanApi = {
 export const mockDeviceApi = {
   getDevices: () => mockApiClient.get('/api/devices'),
   getDevice: (id: string) => mockApiClient.get(`/api/devices/${id}`),
+  getInventory: (id: string) => mockApiClient.get(`/api/devices/${id}/inventory`),
 };
 
 export const mockAdminDeviceApi = {
@@ -258,12 +277,23 @@ export const mockAdminDeviceApi = {
                   category: (values[3] === 'iPhone' ? 'iPhone' : 'Android') as 'iPhone' | 'Android',
                   priceRange: (['entry', 'mid', 'premium'].includes(values[4]) ? values[4] : 'mid') as 'entry' | 'mid' | 'premium',
                   price: parseInt(values[5]) || 0,
-                  colors: [],
-                  storageOptions: [],
+                  colors: ['ブラック', 'ホワイト'],
+                  storageOptions: ['128GB', '256GB'],
                   inStock: values[6] === '有り',
                   imageUrl: '',
-                  specifications: '',
-                  galleryImages: []
+                  specifications: JSON.stringify({
+                    'ディスプレイ': '6.1インチ',
+                    'チップ': 'A15 Bionic',
+                    'カメラ': '12MP',
+                    'バッテリー': '3095mAh'
+                  }),
+                  galleryImages: [
+                    'https://via.placeholder.com/400x600/000000/FFFFFF?text=Front',
+                    'https://via.placeholder.com/400x600/333333/FFFFFF?text=Back',
+                    'https://via.placeholder.com/400x600/666666/FFFFFF?text=Side'
+                  ],
+                  releaseDate: new Date().toISOString(),
+                  popularity: Math.floor(Math.random() * 100),
                 };
                 devices.push(newDevice);
                 successfulRows++;
