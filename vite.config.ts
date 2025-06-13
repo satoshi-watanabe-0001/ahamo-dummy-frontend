@@ -10,7 +10,7 @@ export default defineConfig({
   },
   server: {
     host: true,
-    allowedHosts: ['front-demo-website-tunnel-fxhwiwav.devinapps.com'],
+    allowedHosts: ['front-demo-website-tunnel-t859to6b.devinapps.com'],
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
