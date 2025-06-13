@@ -13,6 +13,12 @@ export interface Contract {
   status: 'draft' | 'active' | 'cancelled' | 'completed';
   createdAt: string;
   updatedAt: string;
+  customerInfo: {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    address: string;
+  };
 }
 
 export interface Plan {
@@ -186,5 +192,17 @@ export interface QualityCheckResult {
 export type ComponentSize = 'sm' | 'md' | 'lg';
 export type ComponentVariant = 'default' | 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost';
 export type ComponentState = 'default' | 'hover' | 'active' | 'disabled' | 'loading';
+
+export interface ContractConfirmationData {
+  checkedItems: string[];
+  contractId?: string;
+  confirmationTimestamp?: number;
+}
+
+export interface ContractConfirmationRequest {
+  contractId: string;
+  confirmationData: ContractConfirmationData;
+  ipAddress?: string;
+}
 
 export * from './mnp';

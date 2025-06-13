@@ -1,39 +1,11 @@
 import { useState } from 'react';
-import { AdminDeviceApp } from './components/admin/AdminDeviceApp';
-import DemoLayout from './components/templates/DemoLayout';
-import ComponentShowcase from './components/templates/ComponentShowcase';
-import { OptionManager } from './components/organisms/OptionManager';
-import { Button } from './components/atoms';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './components/molecules';
-import { Badge } from './components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
-import { HighContrastToggle } from './components/ui/high-contrast-toggle';
-import { PlanComparison } from './components/organisms/PlanComparison';
-import { FeeSimulator } from './components/organisms/FeeSimulator';
-import { DeviceCatalog } from './components/device/DeviceCatalog';
-import { DeviceDetail } from './components/organisms/DeviceDetail';
-import { DeviceComparisonPage } from './components/pages/DeviceComparisonPage';
-import { PersonalInfoForm } from './components/forms/PersonalInfoForm';
-import { MnpTransferForm } from './components/organisms/MnpTransferForm';
+import { ConfirmationChecklist } from './components/molecules/ConfirmationChecklist';
+import { ContractSummary } from './components/organisms/ContractSummary';
+import { ImportantTermsHighlight } from './components/organisms/ImportantTermsHighlight';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
-  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison'>('demo');
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
-
-  const handleDeviceSelect = (deviceId: string) => {
-    setSelectedDeviceId(deviceId);
-    setCurrentView('device-detail');
-  };
-
-  const handleBackToDemo = () => {
-    setCurrentView('demo');
-    setSelectedDeviceId(null);
-  };
-
-  const handleShowComparison = () => {
-    setCurrentView('device-comparison');
-  };
+  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation'>('demo');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,7 +16,6 @@ function App() {
               <h1 className="text-xl font-semibold text-gray-900">Ahamo Admin</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <HighContrastToggle />
               <button
                 onClick={() => setShowAdmin(!showAdmin)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -56,188 +27,94 @@ function App() {
         </div>
       </nav>
       
-      {showAdmin ? (
-        <AdminDeviceApp />
-      ) : currentView === 'device-detail' && selectedDeviceId ? (
-        <DeviceDetail
-          deviceId={selectedDeviceId}
-          onBack={handleBackToDemo}
-          onShowComparison={handleShowComparison}
-        />
-      ) : currentView === 'device-comparison' ? (
-        <DeviceComparisonPage onBack={handleBackToDemo} />
-      ) : (
-        <DemoLayout 
-          title="Ahamo UI Component Library" 
-          description="React + TypeScript + Tailwind CSS コンポーネントライブラリのデモ"
-        >
-          <div className="space-y-12">
-            <ComponentShowcase 
-              title="Atoms - 基本コンポーネント"
-              description="最小単位のUIコンポーネント"
-            >
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Button バリエーション</h3>
-                  <div className="flex flex-wrap gap-4">
-                    <Button variant="default">Default</Button>
-                    <Button variant="destructive">Destructive</Button>
-                    <Button variant="outline">Outline</Button>
-                    <Button variant="secondary">Secondary</Button>
-                    <Button variant="ghost">Ghost</Button>
-                    <Button variant="link">Link</Button>
-                  </div>
+      <div className="p-8">
+        <h2 className="text-2xl font-bold mb-4">Contract Confirmation Feature</h2>
+        <p className="mb-4">Current view: {currentView}</p>
+        <div className="space-x-4">
+          <button 
+            onClick={() => setCurrentView('demo')}
+            className="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Demo
+          </button>
+          <button 
+            onClick={() => setCurrentView('contract-confirmation')}
+            className="px-4 py-2 bg-green-600 text-white rounded"
+          >
+            Contract Confirmation
+          </button>
+        </div>
+        
+        {currentView === 'contract-confirmation' && (
+          <div className="mt-8 space-y-6">
+            <div className="p-6 bg-white rounded-lg shadow">
+              <h3 className="text-xl font-bold mb-4">契約確認画面</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h4 className="font-semibold">契約サマリー</h4>
+                  <ContractSummary
+                    contract={{
+                      id: 'demo-contract',
+                      planId: 'ahamo-20gb',
+                      deviceId: 'iphone-15',
+                      customerName: '田中太郎',
+                      customerEmail: 'tanaka@example.com',
+                      customerPhone: '090-1234-5678',
+                      status: 'draft',
+                      createdAt: '2024-01-01',
+                      updatedAt: '2024-01-01',
+                      customerInfo: {
+                        name: '田中太郎',
+                        email: 'tanaka@example.com',
+                        phoneNumber: '090-1234-5678',
+                        address: '東京都渋谷区'
+                      }
+                    }}
+                    plan={{
+                      id: 'ahamo-20gb',
+                      name: 'ahamo',
+                      monthlyFee: 2970,
+                      description: '20GBの大容量プラン。5分以内の国内通話無料。',
+                      dataCapacity: '20GB',
+                      voiceCalls: '5分以内無料',
+                      sms: '送信3.3円/通',
+                      features: ['20GBまで高速データ通信', '5分以内の国内通話無料', '海外82の国・地域でデータ通信可能'],
+                      isActive: true
+                    }}
+                    device={{
+                      id: 'iphone-15',
+                      name: 'iPhone 15',
+                      brand: 'Apple',
+                      price: 124800,
+                      category: 'iPhone',
+                      priceRange: 'premium',
+                      colors: ['ブルー', 'ピンク', 'イエロー'],
+                      storageOptions: ['128GB', '256GB', '512GB'],
+                      inStock: true,
+                      releaseDate: '2023-09-22',
+                      popularity: 95
+                    }}
+                    onChangePlan={() => console.log('プラン変更')}
+                    onChangeDevice={() => console.log('デバイス変更')}
+                    onChangePersonalInfo={() => console.log('個人情報変更')}
+                  />
+                </div>
+                <div className="space-y-4">
+                  <h4 className="font-semibold">重要事項</h4>
+                  <ImportantTermsHighlight />
                 </div>
               </div>
-            </ComponentShowcase>
-
-            <ComponentShowcase 
-              title="Organisms - プラン比較機能"
-              description="プラン一覧表示・比較機能のデモ"
-            >
-              <PlanComparison />
-            </ComponentShowcase>
-
-            <ComponentShowcase 
-              title="Molecules - 複合コンポーネント"
-              description="複数のatomsを組み合わせたコンポーネント"
-            >
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Card コンポーネント</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>ahamoベーシック</CardTitle>
-                        <CardDescription>20GB + 5分かけ放題</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">¥2,970</div>
-                        <p className="text-sm text-muted-foreground">月額料金（税込）</p>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>ahamo大盛り</CardTitle>
-                        <CardDescription>100GB + 5分かけ放題</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">¥4,950</div>
-                        <p className="text-sm text-muted-foreground">月額料金（税込）</p>
-                        <Badge className="mt-2" variant="default">人気</Badge>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>デバイス</CardTitle>
-                        <CardDescription>iPhone 15 Pro</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">¥159,027</div>
-                        <p className="text-sm text-muted-foreground">一括払い（税込）</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Tabs コンポーネント</h3>
-                  <Tabs defaultValue="plans" className="w-full">
-                    <TabsList className="grid w-full grid-cols-6">
-                      <TabsTrigger value="plans">料金プラン</TabsTrigger>
-                      <TabsTrigger value="simulator">料金シミュレーション</TabsTrigger>
-                      <TabsTrigger value="devices">デバイス</TabsTrigger>
-                      <TabsTrigger value="options">オプション</TabsTrigger>
-                      <TabsTrigger value="personal-info">個人情報</TabsTrigger>
-                      <TabsTrigger value="mnp">MNP転入</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="plans" className="space-y-4">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>料金プラン選択</CardTitle>
-                          <CardDescription>お客様に最適なプランをお選びください</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <p>ahamoベーシック、ahamo大盛りからお選びいただけます。</p>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                    <TabsContent value="simulator" className="space-y-4">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>料金シミュレーション</CardTitle>
-                          <CardDescription>使用量に基づいてリアルタイムで料金を計算します</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <FeeSimulator selectedPlanId="1" />
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                    <TabsContent value="devices" className="space-y-4">
-                      <DeviceCatalog onDeviceSelect={handleDeviceSelect} />
-                    </TabsContent>
-                    <TabsContent value="options" className="space-y-4">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>オプションサービス</CardTitle>
-                          <CardDescription>便利なオプションサービスを選択してください</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <OptionManager 
-                            selectedPlanId="1"
-                            baseUsage={{
-                              dataUsage: 15,
-                              callMinutes: 120,
-                              smsCount: 20
-                            }}
-                          />
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                    <TabsContent value="personal-info" className="space-y-4">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>個人情報入力フォーム</CardTitle>
-                          <CardDescription>SCRUM-53: リアルタイムバリデーション・住所自動補完機能付き</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <PersonalInfoForm 
-                            onSubmit={(data) => {
-                              console.log('Form submitted:', data);
-                              alert('フォーム送信完了: ' + JSON.stringify(data, null, 2));
-                            }}
-                            onSave={(data) => {
-                              console.log('Form auto-saved:', data);
-                            }}
-                          />
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                    <TabsContent value="mnp" className="space-y-4">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>MNP転入申請</CardTitle>
-                          <CardDescription>SCRUM-54: MNP予約番号入力・検証機能付き転入申請フォーム</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <MnpTransferForm 
-                            onSubmit={(data) => {
-                              console.log('MNP Transfer submitted:', data);
-                              alert('MNP転入申請完了: ' + JSON.stringify(data, null, 2));
-                            }}
-                          />
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </div>
-            </ComponentShowcase>
+            </div>
+            <div className="p-6 bg-white rounded-lg shadow">
+              <h4 className="font-semibold mb-4">確認事項</h4>
+              <ConfirmationChecklist
+                checkedItems={[]}
+                onItemChange={(itemId, checked) => console.log(`${itemId}: ${checked}`)}
+              />
+            </div>
           </div>
-        </DemoLayout>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -157,6 +157,8 @@ export const contractApi = USE_MOCK_API ? mockContractApi : {
   createContract: (data: any) => apiClient.post('/api/contracts', data),
   updateContract: (id: string, data: any) => apiClient.put(`/api/contracts/${id}`, data),
   deleteContract: (id: string) => apiClient.delete(`/api/contracts/${id}`),
+  confirmContract: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/confirm`, data),
+  generateContractDocument: (id: string) => apiClient.get(`/api/contracts/${id}/document`)
 };
 
 export const planApi = USE_MOCK_API ? mockPlanApi : {
