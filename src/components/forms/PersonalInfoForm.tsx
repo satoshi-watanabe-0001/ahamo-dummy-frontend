@@ -21,6 +21,11 @@ interface PersonalInfoFormProps {
 export const PersonalInfoForm = ({ onSubmit, onSave }: PersonalInfoFormProps) => {
   const [isAddressLoading, setIsAddressLoading] = useState(false);
   
+  const { register, handleSubmit, formState: { errors }, setValue, watch, trigger, reset } = useForm<PersonalInfoFormData>({
+    resolver: yupResolver(personalInfoSchema),
+    defaultValues: {}
+  });
+
   const {
     saveStatus,
     lastSavedTime,
@@ -63,11 +68,15 @@ export const PersonalInfoForm = ({ onSubmit, onSave }: PersonalInfoFormProps) =>
       });
     }
   });
-  
-  const { register, handleSubmit, formState: { errors }, setValue, watch, trigger, reset } = useForm<PersonalInfoFormData>({
-    resolver: yupResolver(personalInfoSchema),
-    defaultValues: loadData() || {}
-  });
+
+  useEffect(() => {
+    const savedData = loadData();
+    if (savedData) {
+      Object.keys(savedData).forEach(key => {
+        setValue(key as keyof PersonalInfoFormData, savedData[key]);
+      });
+    }
+  }, [loadData, setValue]);
 
   const postalCode = watch('postalCode');
   const debouncedPostalCode = useDebounce(postalCode, 500);
