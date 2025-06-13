@@ -6,8 +6,10 @@ import { ProgressIndicator } from '../ui/progress-indicator';
 import { SaveStatus } from '../ui/save-status';
 import { RestoreDialog } from '../ui/restore-dialog';
 import { CameraCapture } from '../camera/CameraCapture';
+import { FaceGuidance } from '../ui/FaceGuidance';
 import { useFormPersistence } from '../../hooks/useFormPersistence';
 import { useSessionRestore } from '../../hooks/useSessionRestore';
+import { useFacialRecognition } from '../../hooks/useFacialRecognition';
 import { toast } from '../../hooks/use-toast';
 
 export interface VerificationFormData {
@@ -22,6 +24,9 @@ export interface VerificationFormData {
   verificationCode?: string;
   isVerified: boolean;
   captureMethod: 'camera' | 'upload';
+  biometricVerified?: boolean;
+  faceComparisonScore?: number;
+  livenessScore?: number;
 }
 
 interface VerificationFormProps {
@@ -38,9 +43,10 @@ const DOCUMENT_TYPES = [
 
 export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormProps) => {
   const [isUploading, setIsUploading] = useState(false);
-  const [verificationStep, setVerificationStep] = useState<'document' | 'selfie' | 'code' | 'complete'>('document');
+  const [verificationStep, setVerificationStep] = useState<'document' | 'selfie' | 'biometric' | 'code' | 'complete'>('document');
   const [useCameraForDocument, setUseCameraForDocument] = useState(true);
   const [useCameraForSelfie, setUseCameraForSelfie] = useState(true);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
 
   const { register, handleSubmit, setValue, watch, reset } = useForm<VerificationFormData>({
     defaultValues: {
@@ -48,9 +54,23 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
       documentNumber: '',
       verificationCode: '',
       isVerified: false,
-      captureMethod: 'camera'
+      captureMethod: 'camera',
+      biometricVerified: false,
+      faceComparisonScore: 0,
+      livenessScore: 0
     }
   });
+
+  const {
+    livenessState,
+    isProcessing: isBiometricProcessing,
+    error: biometricError,
+    startLivenessDetection,
+    performLivenessCheck,
+    performFaceComparison,
+    resetLivenessDetection,
+    cleanupFacialData
+  } = useFacialRecognition(sessionId);
 
   const {
     saveStatus,
@@ -171,12 +191,16 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
   const handleSelfieCapture = (imageData: string, qualityScore: number) => {
     setValue('selfieImageData', imageData);
     setValue('selfieImageQuality', qualityScore);
-    setVerificationStep('code');
+    setVerificationStep('biometric');
     toast({
       title: '自撮り写真撮影完了',
-      description: `品質スコア: ${qualityScore}/100`,
+      description: `品質スコア: ${qualityScore}/100 - 生体認証を開始します`,
       severity: 'INFO'
     });
+    
+    setTimeout(() => {
+      startLivenessDetection();
+    }, 1000);
   };
 
   const handleSelfieUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,12 +211,16 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       setValue('selfieImage', file);
-      setVerificationStep('code');
+      setVerificationStep('biometric');
       toast({
         title: '自撮り写真アップロード完了',
-        description: '認証コードを入力してください',
+        description: '生体認証を開始します',
         severity: 'INFO'
       });
+      
+      setTimeout(() => {
+        startLivenessDetection();
+      }, 1000);
     } catch (error) {
       toast({
         title: 'アップロードエラー',
@@ -205,6 +233,56 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
   };
 
 
+
+  const handleBiometricComplete = async () => {
+    if (!livenessState.isComplete) {
+      toast({
+        title: '生体認証未完了',
+        description: 'すべての生体認証チャレンジを完了してください',
+        severity: 'WARNING'
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const documentImageData = watch('documentImageData');
+      const selfieImageData = watch('selfieImageData');
+      
+      if (documentImageData && selfieImageData) {
+        const comparisonResult = await performFaceComparison(documentImageData, selfieImageData);
+        
+        if (comparisonResult && comparisonResult.isMatch) {
+          setValue('biometricVerified', true);
+          setValue('faceComparisonScore', comparisonResult.similarityScore);
+          setValue('livenessScore', livenessState.confidenceScore);
+          setVerificationStep('code');
+          
+          toast({
+            title: '生体認証完了',
+            description: `顔照合成功 (類似度: ${comparisonResult.similarityScore.toFixed(1)}%)`,
+            severity: 'INFO'
+          });
+        } else {
+          toast({
+            title: '顔照合失敗',
+            description: '身分証明書の写真と自撮り写真が一致しません',
+            severity: 'WARNING'
+          });
+          resetLivenessDetection();
+          setVerificationStep('selfie');
+        }
+      }
+    } catch (error) {
+      toast({
+        title: '生体認証エラー',
+        description: '生体認証中にエラーが発生しました',
+        severity: 'WARNING'
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleVerificationCodeSubmit = async () => {
     if (!verificationCode || verificationCode.length !== 6) {
@@ -221,6 +299,9 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
       await new Promise(resolve => setTimeout(resolve, 1500));
       setValue('isVerified', true);
       setVerificationStep('complete');
+      
+      await cleanupFacialData();
+      
       toast({
         title: '本人確認完了',
         description: '本人確認が正常に完了しました',
@@ -400,19 +481,21 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
                     </div>
                     
                     {useCameraForSelfie ? (
-                      <CameraCapture
-                        documentType="license"
-                        onCapture={handleSelfieCapture}
-                        onError={(error: string) => {
-                          toast({
-                            title: 'カメラエラー',
-                            description: error,
-                            severity: 'WARNING'
-                          });
-                        }}
-                        onFallbackToUpload={() => setUseCameraForSelfie(false)}
-                        className="w-full max-w-md mx-auto"
-                      />
+                      <div className="relative">
+                        <CameraCapture
+                          documentType="license"
+                          onCapture={handleSelfieCapture}
+                          onError={(error: string) => {
+                            toast({
+                              title: 'カメラエラー',
+                              description: error,
+                              severity: 'WARNING'
+                            });
+                          }}
+                          onFallbackToUpload={() => setUseCameraForSelfie(false)}
+                          className="w-full max-w-md mx-auto"
+                        />
+                      </div>
                     ) : (
                       <div>
                         <input
@@ -438,12 +521,102 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
               </div>
             </div>
 
+            {verificationStep === 'biometric' && (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                <div className="text-center">
+                  <div className="mb-4">
+                    <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
+                      livenessState.isComplete ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                    }`}>
+                      {livenessState.isComplete ? '✓' : '3'}
+                    </div>
+                    <h4 className="font-medium">生体認証</h4>
+                    <p className="text-sm text-gray-600">なりすまし防止のため生体認証を行います</p>
+                  </div>
+                  
+                  {livenessState.isActive && (
+                    <div className="space-y-4">
+                      <div className="relative bg-gray-900 rounded-lg overflow-hidden" style={{ aspectRatio: '4/3', maxWidth: '400px', margin: '0 auto' }}>
+                        <CameraCapture
+                          documentType="license"
+                          onCapture={(imageData) => {
+                            if (livenessState.currentChallenge) {
+                              performLivenessCheck(imageData);
+                            }
+                          }}
+                          onError={(error: string) => {
+                            toast({
+                              title: '生体認証エラー',
+                              description: error,
+                              severity: 'WARNING'
+                            });
+                          }}
+                          className="w-full h-full"
+                          autoCapture={true}
+                          captureInterval={2000}
+                        />
+                        <FaceGuidance
+                          isActive={livenessState.isActive}
+                          currentChallenge={livenessState.currentChallenge?.type}
+                          guidance={livenessState.guidance}
+                          confidenceScore={livenessState.confidenceScore}
+                          isProcessing={isBiometricProcessing}
+                        />
+                      </div>
+                      
+                      <div className="text-sm text-gray-600">
+                        <p>完了したチャレンジ: {livenessState.completedChallenges.length}/3</p>
+                        {livenessState.currentChallenge && (
+                          <p className="font-medium text-blue-600 mt-2">
+                            {livenessState.currentChallenge.instruction}
+                          </p>
+                        )}
+                      </div>
+                      
+                      {biometricError && (
+                        <div className="text-red-600 text-sm">
+                          エラー: {biometricError}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {livenessState.isComplete && (
+                    <div className="space-y-4">
+                      <div className="text-green-600">
+                        <p className="font-medium">生体認証完了</p>
+                        <p className="text-sm">信頼度スコア: {livenessState.confidenceScore.toFixed(1)}%</p>
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleBiometricComplete}
+                        disabled={isUploading}
+                        className="w-full"
+                      >
+                        {isUploading ? '顔照合中...' : '顔照合を実行'}
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {!livenessState.isActive && !livenessState.isComplete && (
+                    <Button
+                      type="button"
+                      onClick={startLivenessDetection}
+                      className="w-full"
+                    >
+                      生体認証を開始
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {verificationStep === 'code' && (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                 <div className="text-center">
                   <div className="mb-4">
                     <div className="w-16 h-16 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                      3
+                      4
                     </div>
                     <h4 className="font-medium">認証コード入力</h4>
                     <p className="text-sm text-gray-600">SMSで送信された6桁の認証コードを入力してください</p>
