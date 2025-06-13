@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
@@ -8,6 +8,9 @@ import { RestoreDialog } from '../ui/restore-dialog';
 import { useFormPersistence } from '../../hooks/useFormPersistence';
 import { useSessionRestore } from '../../hooks/useSessionRestore';
 import { toast } from '../../hooks/use-toast';
+
+import { paymentTokenizer } from '../../services/paymentTokenizer';
+import type { BankInfo, BranchInfo, PaymentValidationResult } from '../../types/payment';
 
 export interface PaymentFormData {
   paymentMethod: 'credit' | 'bank' | 'convenience';
@@ -19,6 +22,9 @@ export interface PaymentFormData {
   bankBranch?: string;
   bankAccount?: string;
   bankAccountName?: string;
+  bankCode?: string;
+  branchCode?: string;
+  paymentToken?: string;
   billingAddress: {
     postalCode: string;
     prefecture: string;
@@ -43,6 +49,14 @@ const PAYMENT_METHODS = [
 ];
 
 export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
+  const [paymentToken, setPaymentToken] = useState<string>('');
+  const [maskedCardNumber, setMaskedCardNumber] = useState<string>('');
+  const [bankSuggestions, setBankSuggestions] = useState<BankInfo[]>([]);
+  const [branchSuggestions, setBranchSuggestions] = useState<BranchInfo[]>([]);
+  const [selectedBank, setSelectedBank] = useState<BankInfo | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState<BranchInfo | null>(null);
+  const [bankAccountValidation, setBankAccountValidation] = useState<PaymentValidationResult | null>(null);
+
   const {
     saveStatus,
     lastSavedTime,
@@ -98,7 +112,7 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
     }
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<PaymentFormData>({
+  const { register, handleSubmit, setValue, watch, reset } = useForm<PaymentFormData>({
     defaultValues: loadData() || {
       paymentMethod: 'credit',
       billingAddress: {
@@ -118,12 +132,101 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
   const agreementPrivacy = watch('agreementPrivacy');
 
   useEffect(() => {
-    const subscription = watch((data) => {
+    const subscription = watch((data: any) => {
       updateFormData(data);
       onSave?.(data as PaymentFormData);
     });
     return () => subscription.unsubscribe();
   }, [watch, onSave, updateFormData]);
+
+  const handleTokenReceived = useCallback((token: string, maskedCard: string) => {
+    setPaymentToken(token);
+    setMaskedCardNumber(maskedCard);
+    setValue('paymentToken', token);
+  }, [setValue]);
+
+  const handleTokenError = useCallback((error: string) => {
+    toast({
+      title: 'カード情報エラー',
+      description: error,
+      severity: 'WARNING'
+    });
+  }, []);
+
+  const handleClearToken = useCallback(() => {
+    setPaymentToken('');
+    setMaskedCardNumber('');
+    setValue('paymentToken', '');
+  }, [setValue]);
+
+  const handleBankSearch = useCallback(async (e: any) => {
+    const query = e.target.value;
+    setValue('bankName', query);
+    
+    if (query.length >= 2) {
+      const banks = await paymentTokenizer.searchBanks(query);
+      setBankSuggestions(banks);
+    } else {
+      setBankSuggestions([]);
+    }
+    
+    setSelectedBank(null);
+    setBranchSuggestions([]);
+    setSelectedBranch(null);
+  }, [setValue]);
+
+  const selectBank = useCallback((bank: BankInfo) => {
+    setSelectedBank(bank);
+    setValue('bankName', bank.name);
+    setValue('bankCode', bank.code);
+    setBankSuggestions([]);
+    setBranchSuggestions([]);
+    setSelectedBranch(null);
+  }, [setValue]);
+
+  const handleBranchSearch = useCallback(async (e: any) => {
+    const query = e.target.value;
+    setValue('bankBranch', query);
+    
+    if (selectedBank && query.length >= 1) {
+      const branches = await paymentTokenizer.searchBranches(selectedBank.code, query);
+      setBranchSuggestions(branches);
+    } else {
+      setBranchSuggestions([]);
+    }
+    
+    setSelectedBranch(null);
+  }, [selectedBank, setValue]);
+
+  const selectBranch = useCallback((branch: BranchInfo) => {
+    setSelectedBranch(branch);
+    setValue('bankBranch', branch.name);
+    setValue('branchCode', branch.code);
+    setBranchSuggestions([]);
+  }, [setValue]);
+
+  const validateBankAccount = useCallback(async () => {
+    if (selectedBank && selectedBranch) {
+      const accountNumber = watch('bankAccount');
+      const accountName = watch('bankAccountName');
+      
+      if (accountNumber && accountName) {
+        const validation = await paymentTokenizer.validateBankAccount(
+          selectedBank.code,
+          selectedBranch.code,
+          accountNumber,
+          accountName
+        );
+        setBankAccountValidation(validation);
+      }
+    }
+  }, [selectedBank, selectedBranch, watch]);
+
+  useEffect(() => {
+    if (paymentMethod === 'bank') {
+      validateBankAccount();
+    }
+  }, [paymentMethod, validateBankAccount]);
 
   const handleFormSubmit = (data: PaymentFormData) => {
     if (!data.agreementTerms || !data.agreementPrivacy) {
@@ -134,32 +237,24 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
       });
       return;
     }
+    
+    if (data.paymentMethod === 'credit' && !paymentToken) {
+      toast({
+        title: 'カード情報が必要です',
+        description: 'クレジットカード情報を入力してください',
+        severity: 'WARNING'
+      });
+      return;
+    }
+    
     clearData();
-    onSubmit(data);
+    onSubmit({
+      ...data,
+      paymentToken: paymentToken || undefined
+    });
   };
 
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = matches && matches[0] || '';
-    const parts = [];
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-    if (parts.length) {
-      return parts.join(' ');
-    } else {
-      return v;
-    }
-  };
 
-  const formatExpiry = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    if (v.length >= 2) {
-      return v.substring(0, 2) + '/' + v.substring(2, 4);
-    }
-    return v;
-  };
 
   return (
     <>
@@ -182,7 +277,7 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
         <SaveStatus
           status={saveStatus}
           onManualSave={manualSave}
-          lastSavedTime={lastSavedTime}
+          lastSavedTime={lastSavedTime || undefined}
           className="mb-6"
         />
       
@@ -210,51 +305,44 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
           {paymentMethod === 'credit' && (
             <div>
               <h3 className="text-lg font-medium mb-4">クレジットカード情報</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">カード番号</label>
-                  <Input
-                    {...register('creditCardNumber')}
-                    placeholder="1234 5678 9012 3456"
-                    maxLength={19}
-                    onChange={(e) => {
-                      const formatted = formatCardNumber(e.target.value);
-                      setValue('creditCardNumber', formatted);
+              <div className="border rounded-lg p-4 bg-gray-50">
+                <p className="text-sm text-gray-600 mb-3">
+                  セキュリティのため、カード情報は安全な環境で入力されます
+                </p>
+                {!paymentToken ? (
+                  <iframe
+                    src="/secure-card-form.html"
+                    className="w-full h-96 border-0 rounded"
+                    sandbox="allow-scripts allow-same-origin allow-forms"
+                    title="Secure Card Input"
+                    onLoad={() => {
+                      window.addEventListener('message', (event) => {
+                        if (event.data.type === 'PAYMENT_TOKEN_SUCCESS') {
+                          handleTokenReceived(event.data.token, event.data.maskedCardNumber);
+                        } else if (event.data.type === 'PAYMENT_TOKEN_ERROR') {
+                          handleTokenError(event.data.error);
+                        }
+                      });
                     }}
                   />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">有効期限</label>
-                    <Input
-                      {...register('creditCardExpiry')}
-                      placeholder="MM/YY"
-                      maxLength={5}
-                      onChange={(e) => {
-                        const formatted = formatExpiry(e.target.value);
-                        setValue('creditCardExpiry', formatted);
-                      }}
-                    />
+                ) : (
+                  <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-green-700 font-medium">カード情報が安全に保存されました</span>
+                    </div>
+                    <p className="text-green-600 text-sm mt-1">{maskedCardNumber}</p>
+                    <button
+                      type="button"
+                      onClick={handleClearToken}
+                      className="text-blue-600 hover:text-blue-800 text-sm mt-2"
+                    >
+                      カード情報を変更する
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">セキュリティコード</label>
-                    <Input
-                      {...register('creditCardCvc')}
-                      placeholder="123"
-                      maxLength={4}
-                      type="password"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">カード名義人</label>
-                  <Input
-                    {...register('creditCardName')}
-                    placeholder="TARO YAMADA"
-                  />
-                </div>
+                )}
               </div>
             </div>
           )}
@@ -263,20 +351,53 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
             <div>
               <h3 className="text-lg font-medium mb-4">銀行口座情報</h3>
               <div className="space-y-4">
-                <div>
+                <div className="relative">
                   <label className="block text-sm font-medium mb-2">銀行名</label>
                   <Input
                     {...register('bankName')}
                     placeholder="○○銀行"
+                    onChange={handleBankSearch}
+                    autoComplete="off"
                   />
+                  {bankSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {bankSuggestions.map((bank, index) => (
+                        <div
+                          key={index}
+                          className="p-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                          onClick={() => selectBank(bank)}
+                        >
+                          <div className="font-medium">{bank.name}</div>
+                          <div className="text-sm text-gray-500">コード: {bank.code}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
-                <div>
+                <div className="relative">
                   <label className="block text-sm font-medium mb-2">支店名</label>
                   <Input
                     {...register('bankBranch')}
                     placeholder="○○支店"
+                    onChange={handleBranchSearch}
+                    disabled={!selectedBank}
+                    autoComplete="off"
                   />
+                  {branchSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {branchSuggestions.map((branch, index) => (
+                        <div
+                          key={index}
+                          className="p-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                          onClick={() => selectBranch(branch)}
+                        >
+                          <div className="font-medium">{branch.name}</div>
+                          <div className="text-sm text-gray-500">コード: {branch.code}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div>
@@ -285,6 +406,11 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
                     {...register('bankAccount')}
                     placeholder="1234567"
                     inputMode="numeric"
+                    maxLength={8}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setValue('bankAccount', value);
+                    }}
                   />
                 </div>
                 
@@ -295,6 +421,21 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
                     placeholder="ヤマダ タロウ"
                   />
                 </div>
+                
+                {bankAccountValidation && (
+                  <div className={`p-3 rounded-md ${bankAccountValidation.valid ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                    <p className={`text-sm ${bankAccountValidation.valid ? 'text-green-700' : 'text-red-700'}`}>
+                      {bankAccountValidation.message}
+                    </p>
+                    {bankAccountValidation.errors && bankAccountValidation.errors.length > 0 && (
+                      <ul className="text-red-600 text-sm mt-1 list-disc list-inside">
+                        {bankAccountValidation.errors.map((error, index) => (
+                          <li key={index}>{error}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Card Input</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            margin: 0;
+            background: #f9fafb;
+        }
+        .form-container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #374151;
+        }
+        .required {
+            color: #ef4444;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .error {
+            border-color: #ef4444;
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .submit-btn {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+        .submit-btn:hover {
+            background: #2563eb;
+        }
+        .submit-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <form id="secureCardForm">
+            <div class="form-group">
+                <label for="cardNumber">カード番号 <span class="required">*</span></label>
+                <input type="text" id="cardNumber" maxlength="19" placeholder="1234 5678 9012 3456" autocomplete="cc-number">
+                <div class="error-message" id="cardNumberError"></div>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="expiryMonth">有効期限（月） <span class="required">*</span></label>
+                    <select id="expiryMonth" autocomplete="cc-exp-month">
+                        <option value="">月を選択</option>
+                        <option value="01">1月</option>
+                        <option value="02">2月</option>
+                        <option value="03">3月</option>
+                        <option value="04">4月</option>
+                        <option value="05">5月</option>
+                        <option value="06">6月</option>
+                        <option value="07">7月</option>
+                        <option value="08">8月</option>
+                        <option value="09">9月</option>
+                        <option value="10">10月</option>
+                        <option value="11">11月</option>
+                        <option value="12">12月</option>
+                    </select>
+                    <div class="error-message" id="expiryMonthError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="expiryYear">有効期限（年） <span class="required">*</span></label>
+                    <select id="expiryYear" autocomplete="cc-exp-year">
+                        <option value="">年を選択</option>
+                    </select>
+                    <div class="error-message" id="expiryYearError"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cvv">セキュリティコード <span class="required">*</span></label>
+                <input type="text" id="cvv" maxlength="4" placeholder="123" autocomplete="cc-csc">
+                <div class="help-text">カード裏面の3桁または4桁の数字</div>
+                <div class="error-message" id="cvvError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="cardHolderName">カード名義人名 <span class="required">*</span></label>
+                <input type="text" id="cardHolderName" placeholder="TARO YAMADA" autocomplete="cc-name">
+                <div class="help-text">カードに記載されている通りに入力してください（英字）</div>
+                <div class="error-message" id="cardHolderNameError"></div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                カード情報を安全に保存
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('secureCardForm');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        const currentYear = new Date().getFullYear();
+        const expiryYearSelect = document.getElementById('expiryYear');
+        for (let i = 0; i < 20; i++) {
+            const year = currentYear + i;
+            const option = document.createElement('option');
+            option.value = year.toString();
+            option.textContent = year + '年';
+            expiryYearSelect.appendChild(option);
+        }
+
+        function formatCardNumber(value) {
+            const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            const matches = v.match(/\d{4,16}/g);
+            const match = matches && matches[0] || '';
+            const parts = [];
+            for (let i = 0, len = match.length; i < len; i += 4) {
+                parts.push(match.substring(i, i + 4));
+            }
+            if (parts.length) {
+                return parts.join(' ');
+            } else {
+                return v;
+            }
+        }
+
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            e.target.value = formatCardNumber(e.target.value);
+        });
+
+        document.getElementById('cvv').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(el => el.textContent = '');
+            
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => input.classList.remove('error'));
+        }
+
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+            
+            field.classList.add('error');
+            errorElement.textContent = message;
+        }
+
+        function validateForm() {
+            clearErrors();
+            let isValid = true;
+
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const expiryMonth = document.getElementById('expiryMonth').value;
+            const expiryYear = document.getElementById('expiryYear').value;
+            const cvv = document.getElementById('cvv').value;
+            const cardHolderName = document.getElementById('cardHolderName').value.trim();
+
+            if (!cardNumber) {
+                showError('cardNumber', 'カード番号を入力してください');
+                isValid = false;
+            } else if (cardNumber.length < 13) {
+                showError('cardNumber', 'カード番号が短すぎます');
+                isValid = false;
+            }
+
+            if (!expiryMonth) {
+                showError('expiryMonth', '月を選択してください');
+                isValid = false;
+            }
+
+            if (!expiryYear) {
+                showError('expiryYear', '年を選択してください');
+                isValid = false;
+            }
+
+            if (!cvv) {
+                showError('cvv', 'セキュリティコードを入力してください');
+                isValid = false;
+            } else if (cvv.length < 3) {
+                showError('cvv', 'セキュリティコードが短すぎます');
+                isValid = false;
+            }
+
+            if (!cardHolderName) {
+                showError('cardHolderName', 'カード名義人名を入力してください');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'トークン化中...';
+
+            const cardData = {
+                cardNumber: document.getElementById('cardNumber').value,
+                expiryMonth: document.getElementById('expiryMonth').value,
+                expiryYear: document.getElementById('expiryYear').value,
+                cvv: document.getElementById('cvv').value,
+                cardHolderName: document.getElementById('cardHolderName').value
+            };
+
+            try {
+                window.parent.postMessage({
+                    type: 'CARD_DATA_READY',
+                    data: cardData
+                }, '*');
+
+                form.reset();
+                submitBtn.textContent = '完了';
+                
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'カード情報を安全に保存';
+                }, 2000);
+
+            } catch (error) {
+                window.parent.postMessage({
+                    type: 'CARD_ERROR',
+                    error: 'カード情報の処理に失敗しました'
+                }, '*');
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'カード情報を安全に保存';
+            }
+        });
+
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'CLEAR_FORM') {
+                form.reset();
+                clearErrors();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -210,4 +210,18 @@ export const optionApi = USE_MOCK_API ? mockOptionApi : {
     apiClient.get(`/api/options${category ? `?category=${category}` : ''}`),
 };
 
+export const paymentApi = {
+  getPaymentMethods: () => apiClient.get('/api/payments/methods'),
+  processPayment: (data: any) => apiClient.post('/api/payments/process', data),
+  tokenizeCard: (data: any) => apiClient.post('/api/payments/tokenize', data),
+  validateToken: (token: string) => apiClient.post('/api/payments/validate-token', { token }),
+  searchBanks: (query: string) => apiClient.get(`/api/payments/banks/search?q=${encodeURIComponent(query)}`),
+  searchBranches: (bankCode: string, query: string) => 
+    apiClient.get(`/api/payments/banks/${bankCode}/branches/search?q=${encodeURIComponent(query)}`),
+  validateBankAccount: (data: any) => apiClient.post('/api/payments/validate-bank-account', data),
+  getPaymentStatus: (paymentId: string) => apiClient.get(`/api/payments/${paymentId}/status`),
+  getPaymentHistory: (contractId: string) => apiClient.get(`/api/payments/history/${contractId}`),
+  checkMethodAvailability: (methodId: string) => apiClient.get(`/api/payments/methods/${methodId}/availability`)
+};
+
 export default apiClient;
