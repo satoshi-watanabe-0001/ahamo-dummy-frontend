@@ -20,6 +20,7 @@ export const progressManager = {
     { id: 'plan-selection', name: 'プラン選択', completed: false },
     { id: 'verification', name: '本人確認', completed: false },
     { id: 'payment', name: '決済', completed: false },
+    { id: 'contract-confirmation', name: '契約確認', completed: false },
     { id: 'completion', name: '完了', completed: false }
   ],
 

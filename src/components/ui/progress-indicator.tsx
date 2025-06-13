@@ -35,7 +35,7 @@ export const ProgressIndicator = ({
   };
 
   const getStepId = (index: number): string => {
-    const stepIds = ['personal-info', 'plan-selection', 'verification', 'payment', 'completion'];
+    const stepIds = ['personal-info', 'plan-selection', 'verification', 'payment', 'contract-confirmation', 'completion'];
     return stepIds[index] || `step-${index}`;
   };
 
