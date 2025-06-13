@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { ConfirmationChecklist } from './components/molecules/ConfirmationChecklist';
-import { ContractSummary } from './components/organisms/ContractSummary';
-import { ImportantTermsHighlight } from './components/organisms/ImportantTermsHighlight';
 import { ShippingFormDemo } from './components/forms/ShippingFormDemo';
 import { PaymentDemoPage } from './components/pages/PaymentDemoPage';
+import { ContractCompletionPage } from './components/pages/ContractCompletionPage';
+import { ContractConfirmationPage } from './components/pages/ContractConfirmationPage';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
-  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'shipping-demo' | 'payment-demo'>('demo');
+  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo'>('demo');
+  const [contractData, setContractData] = useState<any>(null);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,6 +46,12 @@ function App() {
             Contract Confirmation
           </button>
           <button 
+            onClick={() => setCurrentView('contract-completion')}
+            className="px-4 py-2 bg-green-700 text-white rounded"
+          >
+            Contract Completion
+          </button>
+          <button 
             onClick={() => setCurrentView('shipping-demo')}
             className="px-4 py-2 bg-purple-600 text-white rounded"
           >
@@ -60,72 +66,18 @@ function App() {
         </div>
         
         {currentView === 'contract-confirmation' && (
-          <div className="mt-8 space-y-6">
-            <div className="p-6 bg-white rounded-lg shadow">
-              <h3 className="text-xl font-bold mb-4">契約確認画面</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h4 className="font-semibold">契約サマリー</h4>
-                  <ContractSummary
-                    contract={{
-                      id: 'demo-contract',
-                      planId: 'ahamo-20gb',
-                      deviceId: 'iphone-15',
-                      customerName: '田中太郎',
-                      customerEmail: 'tanaka@example.com',
-                      customerPhone: '090-1234-5678',
-                      status: 'draft',
-                      createdAt: '2024-01-01',
-                      updatedAt: '2024-01-01',
-                      customerInfo: {
-                        name: '田中太郎',
-                        email: 'tanaka@example.com',
-                        phoneNumber: '090-1234-5678',
-                        address: '東京都渋谷区'
-                      }
-                    }}
-                    plan={{
-                      id: 'ahamo-20gb',
-                      name: 'ahamo',
-                      monthlyFee: 2970,
-                      description: '20GBの大容量プラン。5分以内の国内通話無料。',
-                      dataCapacity: '20GB',
-                      voiceCalls: '5分以内無料',
-                      sms: '送信3.3円/通',
-                      features: ['20GBまで高速データ通信', '5分以内の国内通話無料', '海外82の国・地域でデータ通信可能'],
-                      isActive: true
-                    }}
-                    device={{
-                      id: 'iphone-15',
-                      name: 'iPhone 15',
-                      brand: 'Apple',
-                      price: 124800,
-                      category: 'iPhone',
-                      priceRange: 'premium',
-                      colors: ['ブルー', 'ピンク', 'イエロー'],
-                      storageOptions: ['128GB', '256GB', '512GB'],
-                      inStock: true,
-                      releaseDate: '2023-09-22',
-                      popularity: 95
-                    }}
-                    onChangePlan={() => console.log('プラン変更')}
-                    onChangeDevice={() => console.log('デバイス変更')}
-                    onChangePersonalInfo={() => console.log('個人情報変更')}
-                  />
-                </div>
-                <div className="space-y-4">
-                  <h4 className="font-semibold">重要事項</h4>
-                  <ImportantTermsHighlight />
-                </div>
-              </div>
-            </div>
-            <div className="p-6 bg-white rounded-lg shadow">
-              <h4 className="font-semibold mb-4">確認事項</h4>
-              <ConfirmationChecklist
-                checkedItems={[]}
-                onItemChange={(itemId, checked) => console.log(`${itemId}: ${checked}`)}
-              />
-            </div>
+          <div className="mt-8">
+            <ContractConfirmationPage
+              onSubmit={(data) => {
+                console.log('Contract confirmed:', data);
+                setContractData(data.contractData);
+                setCurrentView('contract-completion');
+              }}
+              onBack={() => setCurrentView('demo')}
+              onChangePlan={() => console.log('プラン変更')}
+              onChangeDevice={() => console.log('デバイス変更')}
+              onChangePersonalInfo={() => console.log('個人情報変更')}
+            />
           </div>
         )}
 
@@ -138,6 +90,57 @@ function App() {
         {currentView === 'payment-demo' && (
           <div className="mt-8">
             <PaymentDemoPage />
+          </div>
+        )}
+
+        {currentView === 'contract-completion' && (
+          <div className="mt-8">
+            <ContractCompletionPage
+              contractData={contractData || {
+                contract: {
+                  id: 'demo-contract-001',
+                  planId: 'ahamo-20gb',
+                  deviceId: 'iphone-15',
+                  customerName: '田中太郎',
+                  customerEmail: 'tanaka@example.com',
+                  customerPhone: '090-1234-5678',
+                  status: 'completed',
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  customerInfo: {
+                    name: '田中太郎',
+                    email: 'tanaka@example.com',
+                    phoneNumber: '090-1234-5678',
+                    address: '東京都渋谷区神南1-1-1'
+                  }
+                },
+                plan: {
+                  id: 'ahamo-20gb',
+                  name: 'ahamo',
+                  monthlyFee: 2970,
+                  description: '20GBの大容量プラン。5分以内の国内通話無料。',
+                  dataCapacity: '20GB',
+                  voiceCalls: '5分以内無料',
+                  sms: '送信3.3円/通',
+                  features: ['20GBまで高速データ通信', '5分以内の国内通話無料', '海外82の国・地域でデータ通信可能'],
+                  isActive: true
+                },
+                device: {
+                  id: 'iphone-15',
+                  name: 'iPhone 15',
+                  brand: 'Apple',
+                  price: 124800,
+                  category: 'iPhone',
+                  priceRange: 'premium',
+                  colors: ['ブルー', 'ピンク', 'イエロー'],
+                  storageOptions: ['128GB', '256GB', '512GB'],
+                  inStock: true,
+                  releaseDate: '2023-09-22',
+                  popularity: 95
+                }
+              }}
+              onBackToHome={() => setCurrentView('demo')}
+            />
           </div>
         )}
       </div>

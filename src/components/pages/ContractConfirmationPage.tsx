@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
 import { SaveStatus } from '../ui/save-status';
@@ -17,7 +17,7 @@ interface ContractConfirmationData {
 }
 
 interface ContractConfirmationPageProps {
-  onSubmit: (data: ContractConfirmationData) => void;
+  onSubmit: (data: ContractConfirmationData & { contractData?: { contract: Contract; plan?: Plan; device?: Device } }) => void;
   onBack?: () => void;
   onChangePlan?: () => void;
   onChangeDevice?: () => void;
@@ -119,7 +119,11 @@ export const ContractConfirmationPage = ({
     }
 
     clearData();
-    onSubmit({ checkedItems, contractId: contract?.id });
+    onSubmit({ 
+      checkedItems, 
+      contractId: contract?.id,
+      contractData: contract ? { contract, plan: plan || undefined, device: device || undefined } : undefined
+    });
   };
 
   if (loading) {

@@ -62,6 +62,10 @@ export const progressManager = {
 
     if (completed) {
       currentProgress.currentStep = Math.max(currentProgress.currentStep, stepIndex + 1);
+      
+      if (stepId === 'completion') {
+        currentProgress.currentStep = currentProgress.totalSteps;
+      }
     }
 
     progressManager.saveProgress(currentProgress);
