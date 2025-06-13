@@ -23,7 +23,7 @@ export const useFormPersistence = (options: UseFormPersistenceOptions) => {
   } = options;
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
-  const [lastSavedTime, setLastSavedTime] = useState<Date | null>(null);
+  const [lastSavedTime, setLastSavedTime] = useState<Date | undefined>(undefined);
   const [formData, setFormData] = useState<any>(null);
 
   const debouncedFormData = useDebounce(formData, debounceMs);
@@ -66,7 +66,7 @@ export const useFormPersistence = (options: UseFormPersistenceOptions) => {
     progressManager.updateStepCompletion(formId, false);
     setFormData(null);
     setSaveStatus('idle');
-    setLastSavedTime(null);
+    setLastSavedTime(undefined);
   }, [formId]);
 
   const manualSave = useCallback(() => {
