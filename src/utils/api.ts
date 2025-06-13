@@ -137,6 +137,7 @@ class ApiClient {
 import { 
   mockApiClient, 
   mockContractApi, 
+
   mockPlanApi, 
   mockDeviceApi, 
   mockAdminDeviceApi,
@@ -158,7 +159,17 @@ export const contractApi = USE_MOCK_API ? mockContractApi : {
   updateContract: (id: string, data: any) => apiClient.put(`/api/contracts/${id}`, data),
   deleteContract: (id: string) => apiClient.delete(`/api/contracts/${id}`),
   confirmContract: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/confirm`, data),
-  generateContractDocument: (id: string) => apiClient.get(`/api/contracts/${id}/document`)
+  generateContractDocument: (id: string) => apiClient.get(`/api/contracts/${id}/document`),
+  getContractDetails: (id: string) => apiClient.get(`/api/contracts/${id}/details`),
+  getContractHistory: (id: string) => apiClient.get(`/api/contracts/${id}/history`),
+  getCurrentOptions: (id: string) => apiClient.get(`/api/contracts/${id}/options`),
+  changePlan: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/plan-change`, data),
+  simulatePlanChange: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/plan-change/simulate`, data),
+  getAvailablePlans: (id: string) => apiClient.get(`/api/contracts/${id}/available-plans`),
+  addOption: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/options`, data),
+  removeOption: (id: string, optionId: string) => apiClient.delete(`/api/contracts/${id}/options/${optionId}`),
+  suspendOption: (id: string, optionId: string) => apiClient.put(`/api/contracts/${id}/options/${optionId}/suspend`),
+  getAvailableOptions: (id: string) => apiClient.get(`/api/contracts/${id}/available-options`)
 };
 
 export const planApi = USE_MOCK_API ? mockPlanApi : {
