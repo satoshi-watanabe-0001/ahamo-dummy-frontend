@@ -57,6 +57,21 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
   const [selectedBranch, setSelectedBranch] = useState<BranchInfo | null>(null);
   const [bankAccountValidation, setBankAccountValidation] = useState<PaymentValidationResult | null>(null);
 
+  const { register, handleSubmit, setValue, watch, reset } = useForm<PaymentFormData>({
+    defaultValues: {
+      paymentMethod: 'credit',
+      billingAddress: {
+        postalCode: '',
+        prefecture: '',
+        city: '',
+        addressLine1: '',
+        addressLine2: ''
+      },
+      agreementTerms: false,
+      agreementPrivacy: false
+    }
+  });
+
   const {
     saveStatus,
     lastSavedTime,
@@ -112,20 +127,20 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
     }
   });
 
-  const { register, handleSubmit, setValue, watch, reset } = useForm<PaymentFormData>({
-    defaultValues: loadData() || {
-      paymentMethod: 'credit',
-      billingAddress: {
-        postalCode: '',
-        prefecture: '',
-        city: '',
-        addressLine1: '',
-        addressLine2: ''
-      },
-      agreementTerms: false,
-      agreementPrivacy: false
+  useEffect(() => {
+    const savedData = loadData();
+    if (savedData) {
+      Object.keys(savedData).forEach(key => {
+        if (key === 'billingAddress' && savedData[key]) {
+          Object.keys(savedData[key]).forEach(addressKey => {
+            setValue(`billingAddress.${addressKey}` as any, savedData[key][addressKey]);
+          });
+        } else {
+          setValue(key as keyof PaymentFormData, savedData[key]);
+        }
+      });
     }
-  });
+  }, [setValue, loadData]);
 
   const paymentMethod = watch('paymentMethod');
   const agreementTerms = watch('agreementTerms');

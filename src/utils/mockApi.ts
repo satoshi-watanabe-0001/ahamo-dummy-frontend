@@ -48,6 +48,11 @@ class MockApiClient {
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
     await delay(300 + Math.random() * 500);
     
+    if (endpoint.startsWith('/api/payments/') && endpoint.endsWith('/status')) {
+      const transactionId = endpoint.split('/')[3];
+      return this.getPaymentStatus(transactionId) as Promise<ApiResponse<T>>;
+    }
+    
     if (endpoint === '/api/v1/plans') {
       const plans = getStoredDataTyped(STORAGE_KEYS.PLANS, mockPlans);
       return createMockResponse({ plans, total: plans.length } as T);
@@ -130,6 +135,15 @@ class MockApiClient {
 
   async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     await delay(500 + Math.random() * 700);
+    
+    if (endpoint === '/api/payments/process') {
+      return this.processPayment(data) as Promise<ApiResponse<T>>;
+    }
+    
+    if (endpoint.startsWith('/api/payments/') && endpoint.endsWith('/retry')) {
+      const transactionId = endpoint.split('/')[3];
+      return this.retryPayment(transactionId, data) as Promise<ApiResponse<T>>;
+    }
     
     if (endpoint === '/api/v1/admin/devices') {
       const devices = getStoredDataTyped(STORAGE_KEYS.DEVICES, mockDevices);
@@ -221,6 +235,99 @@ class MockApiClient {
     }
     
     throw createMockError('エンドポイントが見つかりません', 404);
+  }
+
+  async processPayment(paymentData: any): Promise<any> {
+    await delay(800 + Math.random() * 1200);
+    
+    const scenario = Math.random();
+    const transactionId = `TXN_${Date.now()}`;
+    
+    if (scenario > 0.7) {
+      return createMockResponse({
+        success: true,
+        transactionId,
+        status: 'completed',
+        amount: paymentData.amount || 2970,
+        paymentMethod: paymentData.paymentMethod || 'credit',
+        timestamp: new Date(),
+        message: '決済が完了しました'
+      });
+    } else if (scenario > 0.4) {
+      throw {
+        message: 'カードが拒否されました',
+        status: 400,
+        code: 'USER_CARD_DECLINED',
+        type: 'user',
+        details: { reason: 'card_declined' }
+      };
+    } else if (scenario > 0.2) {
+      throw {
+        message: '残高不足です',
+        status: 400,
+        code: 'CARD_INSUFFICIENT_FUNDS',
+        type: 'card_issuer',
+        details: { reason: 'insufficient_funds' }
+      };
+    } else {
+      throw {
+        message: 'システムがタイムアウトしました',
+        status: 500,
+        code: 'SYSTEM_TIMEOUT',
+        type: 'system',
+        details: { reason: 'timeout' }
+      };
+    }
+  }
+
+  async getPaymentStatus(transactionId: string): Promise<any> {
+    await delay(200 + Math.random() * 300);
+    
+    const isProcessing = Math.random() > 0.8; // 20% still processing
+    
+    if (isProcessing) {
+      return createMockResponse({
+        transactionId,
+        status: 'processing',
+        message: '決済処理中です'
+      });
+    }
+    
+    return createMockResponse({
+      transactionId,
+      status: 'completed',
+      amount: 2970,
+      paymentMethod: 'credit',
+      timestamp: new Date(),
+      message: '決済が完了しました'
+    });
+  }
+
+  async retryPayment(transactionId: string, retryData: any): Promise<any> {
+    await delay(600 + Math.random() * 800);
+    
+    const success = Math.random() > 0.2; // 80% success rate
+    const newTransactionId = `TXN_${Date.now()}`;
+    
+    if (success) {
+      return createMockResponse({
+        success: true,
+        transactionId: newTransactionId,
+        status: 'completed',
+        amount: retryData.amount || 2970,
+        paymentMethod: retryData.paymentMethod || 'credit',
+        timestamp: new Date(),
+        message: '決済が完了しました'
+      });
+    } else {
+      throw {
+        message: 'カード情報に誤りがあります',
+        status: 400,
+        code: 'USER_VALIDATION_ERROR',
+        type: 'user',
+        details: { reason: 'invalid_card_info' }
+      };
+    }
   }
 }
 

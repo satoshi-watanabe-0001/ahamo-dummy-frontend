@@ -221,7 +221,56 @@ export const paymentApi = {
   validateBankAccount: (data: any) => apiClient.post('/api/payments/validate-bank-account', data),
   getPaymentStatus: (paymentId: string) => apiClient.get(`/api/payments/${paymentId}/status`),
   getPaymentHistory: (contractId: string) => apiClient.get(`/api/payments/history/${contractId}`),
-  checkMethodAvailability: (methodId: string) => apiClient.get(`/api/payments/methods/${methodId}/availability`)
+  checkMethodAvailability: (methodId: string) => apiClient.get(`/api/payments/methods/${methodId}/availability`),
+  retryPayment: (transactionId: string, data: any) => apiClient.post(`/api/payments/${transactionId}/retry`, data)
+};
+
+export const pollPaymentStatus = async (transactionId: string, maxAttempts: number = 30): Promise<any> => {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      const response = await paymentApi.getPaymentStatus(transactionId);
+      const paymentData = response.data as any;
+      
+      if (paymentData.status === 'completed' || paymentData.status === 'failed') {
+        return paymentData;
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    } catch (error) {
+      console.error('Payment status polling error:', error);
+      if (attempt === maxAttempts - 1) {
+        throw error;
+      }
+    }
+  }
+  
+  throw new Error('Payment status polling timeout');
+};
+
+export const classifyPaymentError = (error: any): ApiError => {
+  const errorMessage = error.message || error.error_message || '決済処理中にエラーが発生しました';
+  const errorStatus = error.status || 400;
+  
+  let severity = ErrorSeverity.CRITICAL;
+  let resolution = 'データを確認して再試行してください';
+  
+  if (error.message?.includes('カード') || error.code?.startsWith('CARD_')) {
+    resolution = 'カード情報を確認するか、別のお支払い方法をお試しください';
+  } else if (error.message?.includes('システム') || error.code?.startsWith('SYSTEM_')) {
+    resolution = 'しばらく時間をおいてから再度お試しください';
+    severity = ErrorSeverity.CRITICAL;
+  } else if (error.message?.includes('入力') || error.code?.startsWith('USER_')) {
+    resolution = '入力内容を確認して再度お試しください';
+    severity = ErrorSeverity.WARNING;
+  }
+  
+  return {
+    message: errorMessage,
+    status: errorStatus,
+    details: error.details,
+    severity,
+    resolution
+  };
 };
 
 export default apiClient;
