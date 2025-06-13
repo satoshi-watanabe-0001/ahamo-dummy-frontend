@@ -156,6 +156,33 @@ export interface PersonalInfo {
   email: string;
 }
 
+export interface CapturedImage {
+  data: string;
+  timestamp: number;
+  qualityScore: number;
+  documentType: 'license' | 'passport' | 'mynumber';
+  side?: 'front' | 'back';
+}
+
+export interface CameraState {
+  isActive: boolean;
+  isReady: boolean;
+  hasPermission: boolean | null;
+  error: string | null;
+  stream: MediaStream | null;
+  devices: MediaDeviceInfo[];
+  currentDeviceId: string | null;
+}
+
+export interface QualityCheckResult {
+  isBlurry: boolean;
+  hasGlare: boolean;
+  isComplete: boolean;
+  hasAdequateResolution: boolean;
+  score: number;
+  feedback: string[];
+}
+
 export type ComponentSize = 'sm' | 'md' | 'lg';
 export type ComponentVariant = 'default' | 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost';
 export type ComponentState = 'default' | 'hover' | 'active' | 'disabled' | 'loading';

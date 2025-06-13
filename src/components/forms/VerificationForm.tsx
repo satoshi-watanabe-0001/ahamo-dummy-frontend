@@ -5,6 +5,7 @@ import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
 import { SaveStatus } from '../ui/save-status';
 import { RestoreDialog } from '../ui/restore-dialog';
+import { CameraCapture } from '../camera/CameraCapture';
 import { useFormPersistence } from '../../hooks/useFormPersistence';
 import { useSessionRestore } from '../../hooks/useSessionRestore';
 import { toast } from '../../hooks/use-toast';
@@ -13,9 +14,14 @@ export interface VerificationFormData {
   documentType: 'license' | 'passport' | 'mynumber';
   documentNumber: string;
   documentImage?: File;
+  documentImageData?: string;
+  documentImageQuality?: number;
   selfieImage?: File;
+  selfieImageData?: string;
+  selfieImageQuality?: number;
   verificationCode?: string;
   isVerified: boolean;
+  captureMethod: 'camera' | 'upload';
 }
 
 interface VerificationFormProps {
@@ -33,6 +39,18 @@ const DOCUMENT_TYPES = [
 export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [verificationStep, setVerificationStep] = useState<'document' | 'selfie' | 'code' | 'complete'>('document');
+  const [useCameraForDocument, setUseCameraForDocument] = useState(true);
+  const [useCameraForSelfie, setUseCameraForSelfie] = useState(true);
+
+  const { register, handleSubmit, setValue, watch, reset } = useForm<VerificationFormData>({
+    defaultValues: {
+      documentType: 'license',
+      documentNumber: '',
+      verificationCode: '',
+      isVerified: false,
+      captureMethod: 'camera'
+    }
+  });
 
   const {
     saveStatus,
@@ -83,19 +101,12 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
     }
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<VerificationFormData>({
-    defaultValues: loadData() || {
-      documentType: 'license',
-      documentNumber: '',
-      verificationCode: '',
-      isVerified: false
-    }
-  });
 
-  const documentType = watch('documentType');
-  const documentNumber = watch('documentNumber');
+
+
   const verificationCode = watch('verificationCode');
   const isVerified = watch('isVerified');
+  const documentType = watch('documentType');
 
   useEffect(() => {
     const subscription = watch((data) => {
@@ -126,6 +137,7 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       setValue('documentImage', file);
+      setValue('captureMethod', 'upload');
       setVerificationStep('selfie');
       toast({
         title: '書類アップロード完了',
@@ -141,6 +153,30 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
     } finally {
       setIsUploading(false);
     }
+  };
+
+
+  const handleDocumentCapture = (imageData: string, qualityScore: number) => {
+    setValue('documentImageData', imageData);
+    setValue('documentImageQuality', qualityScore);
+    setValue('captureMethod', 'camera');
+    setVerificationStep('selfie');
+    toast({
+      title: '書類撮影完了',
+      description: `品質スコア: ${qualityScore}/100`,
+      severity: 'INFO'
+    });
+  };
+
+  const handleSelfieCapture = (imageData: string, qualityScore: number) => {
+    setValue('selfieImageData', imageData);
+    setValue('selfieImageQuality', qualityScore);
+    setVerificationStep('code');
+    toast({
+      title: '自撮り写真撮影完了',
+      description: `品質スコア: ${qualityScore}/100`,
+      severity: 'INFO'
+    });
   };
 
   const handleSelfieUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,6 +203,8 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
       setIsUploading(false);
     }
   };
+
+
 
   const handleVerificationCodeSubmit = async () => {
     if (!verificationCode || verificationCode.length !== 6) {
@@ -220,7 +258,7 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
         <SaveStatus
           status={saveStatus}
           onManualSave={manualSave}
-          lastSavedTime={lastSavedTime}
+          lastSavedTime={lastSavedTime || undefined}
           className="mb-6"
         />
       
@@ -259,32 +297,69 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
                 <div className="mb-4">
                   <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
                     verificationStep === 'document' ? 'bg-blue-100 text-blue-600' :
-                    verificationStep !== 'document' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                    ['selfie', 'code', 'complete'].includes(verificationStep) ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
                   }`}>
                     {verificationStep !== 'document' ? '✓' : '1'}
                   </div>
-                  <h4 className="font-medium">書類写真のアップロード</h4>
-                  <p className="text-sm text-gray-600">本人確認書類の写真をアップロードしてください</p>
+                  <h4 className="font-medium">書類写真の撮影・アップロード</h4>
+                  <p className="text-sm text-gray-600">本人確認書類の写真を撮影またはアップロードしてください</p>
                 </div>
                 
                 {verificationStep === 'document' && (
-                  <div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleDocumentUpload}
-                      className="hidden"
-                      id="document-upload"
-                      disabled={isUploading}
-                    />
-                    <label
-                      htmlFor="document-upload"
-                      className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 cursor-pointer ${
-                        isUploading ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    >
-                      {isUploading ? 'アップロード中...' : '写真を選択'}
-                    </label>
+                  <div className="space-y-4">
+                    <div className="flex justify-center space-x-2">
+                      <Button
+                        type="button"
+                        variant={useCameraForDocument ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setUseCameraForDocument(true)}
+                      >
+                        カメラ撮影
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={!useCameraForDocument ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setUseCameraForDocument(false)}
+                      >
+                        ファイル選択
+                      </Button>
+                    </div>
+                    
+                    {useCameraForDocument ? (
+                      <CameraCapture
+                        documentType={documentType}
+                        onCapture={handleDocumentCapture}
+                        onError={(error: string) => {
+                          toast({
+                            title: 'カメラエラー',
+                            description: error,
+                            severity: 'WARNING'
+                          });
+                        }}
+                        onFallbackToUpload={() => setUseCameraForDocument(false)}
+                        className="w-full max-w-md mx-auto"
+                      />
+                    ) : (
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleDocumentUpload}
+                          className="hidden"
+                          id="document-upload"
+                          disabled={isUploading}
+                        />
+                        <label
+                          htmlFor="document-upload"
+                          className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 cursor-pointer ${
+                            isUploading ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          {isUploading ? 'アップロード中...' : '写真を選択'}
+                        </label>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -299,28 +374,65 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
                   }`}>
                     {['code', 'complete'].includes(verificationStep) ? '✓' : '2'}
                   </div>
-                  <h4 className="font-medium">自撮り写真のアップロード</h4>
-                  <p className="text-sm text-gray-600">本人確認のため自撮り写真をアップロードしてください</p>
+                  <h4 className="font-medium">自撮り写真の撮影・アップロード</h4>
+                  <p className="text-sm text-gray-600">本人確認のため自撮り写真を撮影またはアップロードしてください</p>
                 </div>
                 
                 {verificationStep === 'selfie' && (
-                  <div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleSelfieUpload}
-                      className="hidden"
-                      id="selfie-upload"
-                      disabled={isUploading}
-                    />
-                    <label
-                      htmlFor="selfie-upload"
-                      className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 cursor-pointer ${
-                        isUploading ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    >
-                      {isUploading ? 'アップロード中...' : '自撮り写真を選択'}
-                    </label>
+                  <div className="space-y-4">
+                    <div className="flex justify-center space-x-2">
+                      <Button
+                        type="button"
+                        variant={useCameraForSelfie ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setUseCameraForSelfie(true)}
+                      >
+                        カメラ撮影
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={!useCameraForSelfie ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setUseCameraForSelfie(false)}
+                      >
+                        ファイル選択
+                      </Button>
+                    </div>
+                    
+                    {useCameraForSelfie ? (
+                      <CameraCapture
+                        documentType="license"
+                        onCapture={handleSelfieCapture}
+                        onError={(error: string) => {
+                          toast({
+                            title: 'カメラエラー',
+                            description: error,
+                            severity: 'WARNING'
+                          });
+                        }}
+                        onFallbackToUpload={() => setUseCameraForSelfie(false)}
+                        className="w-full max-w-md mx-auto"
+                      />
+                    ) : (
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleSelfieUpload}
+                          className="hidden"
+                          id="selfie-upload"
+                          disabled={isUploading}
+                        />
+                        <label
+                          htmlFor="selfie-upload"
+                          className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 cursor-pointer ${
+                            isUploading ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          {isUploading ? 'アップロード中...' : '自撮り写真を選択'}
+                        </label>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
