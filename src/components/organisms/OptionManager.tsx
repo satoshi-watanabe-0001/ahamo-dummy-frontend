@@ -1,101 +1,164 @@
-import { useState, useEffect, useCallback } from 'react';
-import { OptionSelector } from '../molecules/OptionSelector';
-import { FeeBreakdown } from '../molecules/FeeBreakdown';
-import { Option, FeeCalculationRequestWithOptions, FeeCalculationResult } from '../../types';
-import { feeApi, optionApi } from '../../utils/api';
-import { useDebounce } from '../../hooks/useDebounce';
+import { useState, useEffect } from 'react';
+import { contractApi } from '../../utils/api';
+import { Option } from '../../types';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
 
 interface OptionManagerProps {
-  selectedPlanId: string;
-  baseUsage: {
-    dataUsage: number;
-    callMinutes: number;
-    smsCount: number;
-  };
+  contractId: string;
+  currentOptions: Option[];
 }
 
-export const OptionManager = ({ selectedPlanId, baseUsage }: OptionManagerProps) => {
-  const [options, setOptions] = useState<Option[]>([]);
-  const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([]);
-  const [feeResult, setFeeResult] = useState<FeeCalculationResult | null>(null);
+export const OptionManager = ({ contractId, currentOptions }: OptionManagerProps) => {
+  const [availableOptions, setAvailableOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const debouncedSelection = useDebounce(selectedOptionIds, 500);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadOptions = async () => {
+    const fetchAvailableOptions = async () => {
       try {
-        const response = await optionApi.getOptions();
-        setOptions(response.data.options || []);
+        setLoading(true);
+        const response = await contractApi.getAvailableOptions(contractId);
+        setAvailableOptions((response as any).data);
       } catch (err) {
-        console.error('Failed to load options:', err);
-        setError('オプション情報の取得に失敗しました');
+        console.error('Failed to fetch available options', err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadOptions();
-  }, []);
+    fetchAvailableOptions();
+  }, [contractId]);
 
-  const calculateTotalFee = useCallback(async (optionIds: string[]) => {
-    setLoading(true);
-    setError(null);
-    
+  const handleAddOption = async (optionId: string) => {
     try {
-      const request: FeeCalculationRequestWithOptions = {
-        planId: selectedPlanId,
-        dataUsage: baseUsage.dataUsage,
-        callMinutes: baseUsage.callMinutes,
-        smsCount: baseUsage.smsCount,
-        selectedOptionIds: optionIds
-      };
-
-      const response = await feeApi.calculateTotal(request);
-      setFeeResult(response.data as FeeCalculationResult);
+      setActionLoading(optionId);
+      await contractApi.addOption(contractId, { optionId });
+      alert('オプションを追加しました。');
     } catch (err) {
-      console.error('Fee calculation failed:', err);
-      setError('料金計算に失敗しました');
+      console.error('Failed to add option', err);
+      alert('オプションの追加に失敗しました。');
     } finally {
-      setLoading(false);
+      setActionLoading(null);
     }
-  }, [selectedPlanId, baseUsage]);
-
-  useEffect(() => {
-    calculateTotalFee(debouncedSelection);
-  }, [debouncedSelection, calculateTotalFee]);
-
-  const handleSelectionChange = (newSelection: string[]) => {
-    setSelectedOptionIds(newSelection);
   };
 
+  const handleRemoveOption = async (optionId: string) => {
+    try {
+      setActionLoading(optionId);
+      await contractApi.removeOption(contractId, optionId);
+      alert('オプションを削除しました。');
+    } catch (err) {
+      console.error('Failed to remove option', err);
+      alert('オプションの削除に失敗しました。');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleSuspendOption = async (optionId: string) => {
+    try {
+      setActionLoading(optionId);
+      await contractApi.suspendOption(contractId, optionId);
+      alert('オプションを一時停止しました。');
+    } catch (err) {
+      console.error('Failed to suspend option', err);
+      alert('オプションの一時停止に失敗しました。');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+        <p className="text-gray-600">オプション情報を読み込み中...</p>
+      </div>
+    );
+  }
+
+
+  
+  const currentOptionIds = currentOptions.map((opt: Option) => opt.id);
+  const availableToAdd = availableOptions.filter((opt: Option) => !currentOptionIds.includes(opt.id));
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">オプション選択</h3>
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-            <p className="text-red-600">{error}</p>
-          </div>
-        )}
-        <OptionSelector
-          options={options}
-          selectedOptionIds={selectedOptionIds}
-          onSelectionChange={handleSelectionChange}
-          disabled={loading}
-        />
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold mb-4">料金計算結果</h3>
-        {loading && (
-          <div className="flex items-center justify-center py-8">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-              <p className="text-gray-600">計算中...</p>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>現在のオプション</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {currentOptions.length === 0 ? (
+            <p className="text-gray-600">加入中のオプションはありません。</p>
+          ) : (
+            <div className="space-y-3">
+              {currentOptions.map(option => (
+                <div key={option.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                  <div>
+                    <p className="font-medium">{option.name}</p>
+                    <p className="text-sm text-gray-600">{option.description}</p>
+                    <p className="text-sm font-medium text-blue-600">¥{option.monthlyFee.toLocaleString()}/月</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleSuspendOption(option.id)}
+                      disabled={actionLoading === option.id}
+                      className="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 disabled:opacity-50"
+                    >
+                      {actionLoading === option.id ? '処理中...' : '一時停止'}
+                    </button>
+                    <button
+                      onClick={() => handleRemoveOption(option.id)}
+                      disabled={actionLoading === option.id}
+                      className="px-3 py-1 text-sm bg-red-100 text-red-800 rounded hover:bg-red-200 disabled:opacity-50"
+                    >
+                      {actionLoading === option.id ? '処理中...' : '削除'}
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        )}
-        {feeResult && !loading && <FeeBreakdown result={feeResult} />}
-      </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>追加可能なオプション</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {availableToAdd.length === 0 ? (
+            <p className="text-gray-600">追加可能なオプションはありません。</p>
+          ) : (
+            <div className="space-y-3">
+              {availableToAdd.map(option => (
+                <div key={option.id} className="flex justify-between items-center p-3 border rounded-md">
+                  <div>
+                    <p className="font-medium">{option.name}</p>
+                    <p className="text-sm text-gray-600">{option.description}</p>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <p className="text-sm font-medium text-blue-600">¥{option.monthlyFee.toLocaleString()}/月</p>
+                      {option.oneTimeFee > 0 && (
+                        <p className="text-sm text-gray-600">初回: ¥{option.oneTimeFee.toLocaleString()}</p>
+                      )}
+                      <Badge variant="secondary">{option.category}</Badge>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleAddOption(option.id)}
+                    disabled={actionLoading === option.id}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {actionLoading === option.id ? '追加中...' : '追加'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
