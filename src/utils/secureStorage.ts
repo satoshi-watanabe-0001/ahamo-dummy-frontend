@@ -53,6 +53,32 @@ export const secureStorage = {
     }
   },
 
+  storeImage: (imageData: string, options: SecureStorageOptions = {}): void => {
+    try {
+      const key = options.key || ENCRYPTION_KEY;
+      const ttl = (options.ttlHours || 1) * 60 * 60 * 1000;
+      
+      const imageKey = `${STORAGE_KEY}_image_${Date.now()}`;
+      const encryptedData = encryptData({ imageData, timestamp: Date.now() }, key);
+      const checksum = generateChecksum(encryptedData);
+      
+      const storedData: StoredData = {
+        data: encryptedData,
+        timestamp: Date.now(),
+        ttl,
+        checksum
+      };
+      
+      localStorage.setItem(imageKey, JSON.stringify(storedData));
+      
+      setTimeout(() => {
+        localStorage.removeItem(imageKey);
+      }, ttl);
+    } catch (error) {
+      console.error('Failed to store encrypted image:', error);
+    }
+  },
+
   retrieve: (options: SecureStorageOptions = {}): any | null => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -115,5 +141,42 @@ export const secureStorage = {
     
     const remaining = expirationTime.getTime() - Date.now();
     return Math.max(0, remaining);
+  },
+
+  retrieveImage: (imageKey: string, options: SecureStorageOptions = {}): string | null => {
+    try {
+      const stored = localStorage.getItem(imageKey);
+      if (!stored) return null;
+
+      const storedData: StoredData = JSON.parse(stored);
+
+      if (Date.now() - storedData.timestamp > storedData.ttl) {
+        localStorage.removeItem(imageKey);
+        return null;
+      }
+
+      const currentChecksum = generateChecksum(storedData.data);
+      if (currentChecksum !== storedData.checksum) {
+        console.warn('Image data integrity check failed');
+        localStorage.removeItem(imageKey);
+        return null;
+      }
+
+      const key = options.key || ENCRYPTION_KEY;
+      const decryptedData = decryptData(storedData.data, key);
+      return decryptedData.imageData;
+    } catch (error) {
+      console.warn('Failed to retrieve stored image:', error);
+      return null;
+    }
+  },
+
+  clearAllImages: (): void => {
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith(`${STORAGE_KEY}_image_`)) {
+        localStorage.removeItem(key);
+      }
+    });
   }
 };
