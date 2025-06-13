@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { ConfirmationChecklist } from './components/molecules/ConfirmationChecklist';
 import { ContractSummary } from './components/organisms/ContractSummary';
 import { ImportantTermsHighlight } from './components/organisms/ImportantTermsHighlight';
+import { ShippingFormDemo } from './components/forms/ShippingFormDemo';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
-  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation'>('demo');
+  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'shipping-demo'>('demo');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,6 +43,12 @@ function App() {
             className="px-4 py-2 bg-green-600 text-white rounded"
           >
             Contract Confirmation
+          </button>
+          <button 
+            onClick={() => setCurrentView('shipping-demo')}
+            className="px-4 py-2 bg-purple-600 text-white rounded"
+          >
+            配送設定デモ
           </button>
         </div>
         
@@ -112,6 +119,12 @@ function App() {
                 onItemChange={(itemId, checked) => console.log(`${itemId}: ${checked}`)}
               />
             </div>
+          </div>
+        )}
+
+        {currentView === 'shipping-demo' && (
+          <div className="mt-8">
+            <ShippingFormDemo />
           </div>
         )}
       </div>

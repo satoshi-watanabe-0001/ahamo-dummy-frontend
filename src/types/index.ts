@@ -206,3 +206,61 @@ export interface ContractConfirmationRequest {
 }
 
 export * from './mnp';
+
+export interface Address {
+  postalCode: string;
+  prefecture: string;
+  city: string;
+  addressLine1: string;
+  addressLine2?: string;
+  building?: string;
+}
+
+export interface ConvenienceStore {
+  id: number;
+  storeCode: string;
+  storeName: string;
+  chainName: string;
+  postalCode: string;
+  prefecture: string;
+  city: string;
+  addressLine1: string;
+  addressLine2?: string;
+  phone?: string;
+  latitude?: number;
+  longitude?: number;
+  operatingHours?: string;
+  isActive: boolean;
+}
+
+export interface DeliveryTimeSlot {
+  id: number;
+  slotName: string;
+  startTime: string;
+  endTime: string;
+  slotType: 'MORNING' | 'AFTERNOON' | 'EVENING' | 'CUSTOM';
+  isActive: boolean;
+}
+
+export interface ShippingOption {
+  id: number;
+  optionCode: string;
+  optionName: string;
+  description?: string;
+  requiresRecipientInfo: boolean;
+  isActive: boolean;
+}
+
+export interface ShippingFormData {
+  addressType: 'contract' | 'alternate' | 'work' | 'convenience';
+  alternateAddress?: Address;
+  workAddress?: Address;
+  convenienceStore?: ConvenienceStore | null;
+  deliveryTimeSlot?: DeliveryTimeSlot | null;
+  deliveryOption: string;
+  recipientName?: string;
+  recipientPhone?: string;
+  delegationInfo?: string;
+  deliveryNotes?: string;
+  absenceHandling?: string;
+}
