@@ -3,10 +3,11 @@ import { ConfirmationChecklist } from './components/molecules/ConfirmationCheckl
 import { ContractSummary } from './components/organisms/ContractSummary';
 import { ImportantTermsHighlight } from './components/organisms/ImportantTermsHighlight';
 import { ShippingFormDemo } from './components/forms/ShippingFormDemo';
+import { PaymentDemoPage } from './components/pages/PaymentDemoPage';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
-  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'shipping-demo'>('demo');
+  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'shipping-demo' | 'payment-demo'>('demo');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,6 +50,12 @@ function App() {
             className="px-4 py-2 bg-purple-600 text-white rounded"
           >
             配送設定デモ
+          </button>
+          <button 
+            onClick={() => setCurrentView('payment-demo')}
+            className="px-4 py-2 bg-orange-600 text-white rounded"
+          >
+            決済結果デモ
           </button>
         </div>
         
@@ -125,6 +132,12 @@ function App() {
         {currentView === 'shipping-demo' && (
           <div className="mt-8">
             <ShippingFormDemo />
+          </div>
+        )}
+
+        {currentView === 'payment-demo' && (
+          <div className="mt-8">
+            <PaymentDemoPage />
           </div>
         )}
       </div>
