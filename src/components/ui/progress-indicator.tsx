@@ -1,5 +1,4 @@
 import { cn } from "../../lib/utils";
-import { progressManager, FormStep } from "../../utils/progressManager";
 
 interface ProgressIndicatorProps {
   currentStep: number;

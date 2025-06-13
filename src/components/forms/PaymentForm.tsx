@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
@@ -98,7 +98,7 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
     }
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<PaymentFormData>({
+  const { register, handleSubmit, setValue, watch, reset } = useForm<PaymentFormData>({
     defaultValues: loadData() || {
       paymentMethod: 'credit',
       billingAddress: {
@@ -182,7 +182,7 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
         <SaveStatus
           status={saveStatus}
           onManualSave={manualSave}
-          lastSavedTime={lastSavedTime}
+          lastSavedTime={lastSavedTime || undefined}
           className="mb-6"
         />
       
