@@ -130,7 +130,7 @@ export const UsageProfilingForm = ({ onSubmit, onSave, onBack }: UsageProfilingF
         }
       });
     }
-  }, [loadData, setValue]);
+  }, []);
 
   const monthlyDataUsage = watch('monthlyDataUsage');
   const callFrequency = watch('callFrequency');
@@ -139,11 +139,13 @@ export const UsageProfilingForm = ({ onSubmit, onSave, onBack }: UsageProfilingF
 
   useEffect(() => {
     const subscription = watch((data) => {
-      updateFormData(data);
-      onSave?.(data as UsageProfileData);
+      if (data && Object.keys(data).length > 0) {
+        updateFormData(data);
+        onSave?.(data as UsageProfileData);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [watch, onSave, updateFormData]);
+  }, []);
 
   const handleFormSubmit = (data: UsageProfileData) => {
     clearData();

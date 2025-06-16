@@ -76,18 +76,20 @@ export const PersonalInfoForm = ({ onSubmit, onSave }: PersonalInfoFormProps) =>
         setValue(key as keyof PersonalInfoFormData, savedData[key]);
       });
     }
-  }, [loadData, setValue]);
+  }, []);
 
   const postalCode = watch('postalCode');
   const debouncedPostalCode = useDebounce(postalCode, 500);
 
   useEffect(() => {
     const subscription = watch((data) => {
-      updateFormData(data);
-      onSave?.(data as PersonalInfoFormData);
+      if (data && Object.keys(data).length > 0) {
+        updateFormData(data);
+        onSave?.(data as PersonalInfoFormData);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [watch, onSave, updateFormData]);
+  }, []);
 
   useEffect(() => {
     if (debouncedPostalCode && /^\d{3}-\d{4}$/.test(debouncedPostalCode)) {

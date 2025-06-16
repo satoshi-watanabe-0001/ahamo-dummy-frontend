@@ -140,7 +140,7 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
         }
       });
     }
-  }, [setValue, loadData]);
+  }, []);
 
   const paymentMethod = watch('paymentMethod');
   const agreementTerms = watch('agreementTerms');
@@ -148,11 +148,13 @@ export const PaymentForm = ({ onSubmit, onSave, onBack }: PaymentFormProps) => {
 
   useEffect(() => {
     const subscription = watch((data: any) => {
-      updateFormData(data);
-      onSave?.(data as PaymentFormData);
+      if (data && Object.keys(data).length > 0) {
+        updateFormData(data);
+        onSave?.(data as PaymentFormData);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [watch, onSave, updateFormData]);
+  }, []);
 
   const handleTokenReceived = useCallback((token: string, maskedCard: string) => {
     setPaymentToken(token);
