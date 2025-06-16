@@ -27,7 +27,7 @@ export const DeliveryOptions: React.FC<DeliveryOptionsProps> = ({ trackingNumber
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/shipping/delivery-time/${trackingNumber}`, {
+      const response = await fetch(`/api/v1/shipping/delivery-time/${trackingNumber}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ export const DeliveryOptions: React.FC<DeliveryOptionsProps> = ({ trackingNumber
   const handleRequestRedelivery = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/shipping/redelivery/${trackingNumber}`, {
+      const response = await fetch(`/api/v1/shipping/redelivery/${trackingNumber}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -56,7 +56,7 @@ export const SecureCardForm = ({ onTokenReceived, onError }: {
     try {
       const encryptedData = encryptionUtils.encrypt(cardData);
       
-      const response = await fetch('/api/payments/tokenize', {
+      const response = await fetch('/api/v1/payments/tokenize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

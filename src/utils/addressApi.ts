@@ -16,7 +16,7 @@ export const addressApi = {
 
     try {
       const response = await Promise.race([
-        apiClient.get<AddressInfo>(`/api/address/lookup?postal_code=${postalCode}`),
+        apiClient.get<AddressInfo>(`/api/v1/address/lookup?postal_code=${postalCode}`),
         new Promise<never>((_, reject) => 
           setTimeout(() => reject(new Error('Timeout')), 3000)
         )
