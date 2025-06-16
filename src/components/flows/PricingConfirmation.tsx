@@ -74,7 +74,7 @@ export const PricingConfirmation = ({ onSubmit, onBack, selectedDevice, planId }
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-sm">
       <ProgressIndicator 
-        currentStep={4}
+        currentStep={5}
         totalSteps={10}
         steps={['契約タイプ', '利用状況', 'プラン選択', '端末選択', '料金確認', '個人情報', '本人確認', '決済', '契約確認', '完了']}
         showCompletionStatus={true}
