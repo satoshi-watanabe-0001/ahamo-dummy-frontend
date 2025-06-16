@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
 import { SaveStatus } from '../ui/save-status';
@@ -53,6 +53,14 @@ const AVAILABLE_OPTIONS = [
 ];
 
 export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFormProps) => {
+  const { register, handleSubmit, setValue, watch, reset } = useForm<PlanSelectionFormData>({
+    defaultValues: {
+      selectedPlanId: '',
+      selectedOptions: [],
+      contractType: 'new'
+    }
+  });
+
   const {
     saveStatus,
     lastSavedTime,
@@ -64,9 +72,11 @@ export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFor
     formId: 'plan-selection',
     onSave,
     onRestore: (data) => {
-      setValue('selectedPlanId', data.selectedPlanId || '');
-      setValue('selectedOptions', data.selectedOptions || []);
-      setValue('contractType', data.contractType || 'new');
+      if (setValue && data) {
+        setValue('selectedPlanId', data.selectedPlanId || '');
+        setValue('selectedOptions', data.selectedOptions || []);
+        setValue('contractType', data.contractType || 'new');
+      }
     }
   });
 
@@ -77,9 +87,11 @@ export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFor
     closeDialog
   } = useSessionRestore({
     onRestore: (data) => {
-      setValue('selectedPlanId', data.selectedPlanId || '');
-      setValue('selectedOptions', data.selectedOptions || []);
-      setValue('contractType', data.contractType || 'new');
+      if (setValue && data) {
+        setValue('selectedPlanId', data.selectedPlanId || '');
+        setValue('selectedOptions', data.selectedOptions || []);
+        setValue('contractType', data.contractType || 'new');
+      }
       toast({
         title: 'データを復元しました',
         description: 'プラン選択の内容を復元しました',
@@ -96,17 +108,17 @@ export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFor
     }
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<PlanSelectionFormData>({
-    defaultValues: loadData() || {
-      selectedPlanId: '',
-      selectedOptions: [],
-      contractType: 'new'
+  useEffect(() => {
+    const savedData = loadData();
+    if (savedData && setValue) {
+      setValue('selectedPlanId', savedData.selectedPlanId || '');
+      setValue('selectedOptions', savedData.selectedOptions || []);
+      setValue('contractType', savedData.contractType || 'new');
     }
-  });
+  }, [loadData, setValue]);
 
   const selectedPlanId = watch('selectedPlanId');
   const selectedOptions = watch('selectedOptions');
-  const contractType = watch('contractType');
 
   useEffect(() => {
     const subscription = watch((data) => {
@@ -147,10 +159,10 @@ export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFor
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-sm">
         <ProgressIndicator 
           currentStep={2}
-          totalSteps={6}
-          steps={['個人情報', 'プラン選択', '本人確認', '決済', '契約確認', '完了']}
+          totalSteps={10}
+          steps={['契約タイプ', '利用状況', 'プラン選択', '端末選択', '料金確認', '個人情報', '本人確認', '決済', '契約確認', '完了']}
           showCompletionStatus={true}
-          completedSteps={['personal-info']}
+          completedSteps={['contract-type', 'usage-profile']}
         />
         
         <SaveStatus
@@ -161,26 +173,7 @@ export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFor
         />
       
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          <div>
-            <h3 className="text-lg font-medium mb-4">契約タイプ</h3>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { value: 'new', label: '新規契約' },
-                { value: 'mnp', label: 'MNP転入' },
-                { value: 'upgrade', label: '機種変更' }
-              ].map(type => (
-                <label key={type.value} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
-                    {...register('contractType')}
-                    type="radio"
-                    value={type.value}
-                    className="mr-2"
-                  />
-                  <span>{type.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+
 
           <div>
             <h3 className="text-lg font-medium mb-4">プラン選択</h3>
