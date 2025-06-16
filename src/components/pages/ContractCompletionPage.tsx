@@ -58,7 +58,7 @@ export const ContractCompletionPage = ({
     try {
       const response = await contractApi.generateContractDocument(contract.id);
       
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = new Blob([response.data as BlobPart], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

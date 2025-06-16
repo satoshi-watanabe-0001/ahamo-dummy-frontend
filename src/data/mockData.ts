@@ -589,7 +589,13 @@ export const mockContracts: Contract[] = [
     customerPhone: '090-1234-5678',
     status: 'active',
     createdAt: '2024-01-15T09:00:00Z',
-    updatedAt: '2024-01-15T09:00:00Z'
+    updatedAt: '2024-01-15T09:00:00Z',
+    customerInfo: {
+      name: '田中太郎',
+      email: 'tanaka@example.com',
+      phoneNumber: '090-1234-5678',
+      address: '東京都渋谷区1-1-1'
+    }
   },
   {
     id: '2',
@@ -600,7 +606,13 @@ export const mockContracts: Contract[] = [
     customerPhone: '090-2345-6789',
     status: 'active',
     createdAt: '2024-02-01T10:30:00Z',
-    updatedAt: '2024-02-01T10:30:00Z'
+    updatedAt: '2024-02-01T10:30:00Z',
+    customerInfo: {
+      name: '佐藤花子',
+      email: 'sato@example.com',
+      phoneNumber: '090-2345-6789',
+      address: '大阪府大阪市2-2-2'
+    }
   },
   {
     id: '3',
@@ -611,6 +623,12 @@ export const mockContracts: Contract[] = [
     customerPhone: '090-3456-7890',
     status: 'active',
     createdAt: '2024-03-10T14:15:00Z',
-    updatedAt: '2024-03-10T14:15:00Z'
+    updatedAt: '2024-03-10T14:15:00Z',
+    customerInfo: {
+      name: '鈴木一郎',
+      email: 'suzuki@example.com',
+      phoneNumber: '090-3456-7890',
+      address: '愛知県名古屋市3-3-3'
+    }
   }
 ];
