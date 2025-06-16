@@ -129,11 +129,13 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
 
   useEffect(() => {
     const subscription = watch((data) => {
-      updateFormData(data);
-      onSave?.(data as VerificationFormData);
+      if (data && Object.keys(data).length > 0) {
+        updateFormData(data);
+        onSave?.(data as VerificationFormData);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [watch, onSave, updateFormData]);
+  }, []);
 
   const handleFormSubmit = (data: VerificationFormData) => {
     if (!data.isVerified) {

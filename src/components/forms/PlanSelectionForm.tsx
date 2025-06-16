@@ -115,18 +115,20 @@ export const PlanSelectionForm = ({ onSubmit, onSave, onBack }: PlanSelectionFor
       setValue('selectedOptions', savedData.selectedOptions || []);
       setValue('contractType', savedData.contractType || 'new');
     }
-  }, [loadData, setValue]);
+  }, []);
 
   const selectedPlanId = watch('selectedPlanId');
   const selectedOptions = watch('selectedOptions');
 
   useEffect(() => {
     const subscription = watch((data) => {
-      updateFormData(data);
-      onSave?.(data as PlanSelectionFormData);
+      if (data && Object.keys(data).length > 0) {
+        updateFormData(data);
+        onSave?.(data as PlanSelectionFormData);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [watch, onSave, updateFormData]);
+  }, []);
 
   const handleFormSubmit = (data: PlanSelectionFormData) => {
     clearData();
