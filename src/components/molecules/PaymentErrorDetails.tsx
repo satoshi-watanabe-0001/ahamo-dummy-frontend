@@ -25,7 +25,7 @@ export const PaymentErrorDetails: React.FC<PaymentErrorDetailsProps> = ({
     }
   };
 
-  const getErrorSolution = (type?: string, code?: string) => {
+  const getErrorSolution = (type?: string, _code?: string) => {
     switch (type) {
       case 'system':
         return {

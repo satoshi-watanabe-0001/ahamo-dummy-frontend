@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
 import { ContractCompletionSummary } from '../organisms/ContractCompletionSummary';
@@ -24,8 +24,8 @@ export const ContractCompletionPage = ({
 }: ContractCompletionPageProps) => {
   const [loading, setLoading] = useState(false);
   const [contract, setContract] = useState<Contract | null>(contractData?.contract || null);
-  const [plan, setPlan] = useState<Plan | null>(contractData?.plan || null);
-  const [device, setDevice] = useState<Device | null>(contractData?.device || null);
+  const [plan, ] = useState<Plan | null>(contractData?.plan || null);
+  const [device, ] = useState<Device | null>(contractData?.device || null);
 
   useEffect(() => {
     if (!contractData && !contract) {

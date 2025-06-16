@@ -6,8 +6,8 @@ import { paymentApi, classifyPaymentError } from '../../utils/api';
 export const PaymentDemoPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<'form' | 'result'>('form');
   const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [testMode, setTestMode] = useState(false);
+  const [, setIsProcessing] = useState(false);
+  const [_testMode, setTestMode] = useState(false);
 
   const handlePaymentSubmit = async (formData: PaymentFormData) => {
     setIsProcessing(true);

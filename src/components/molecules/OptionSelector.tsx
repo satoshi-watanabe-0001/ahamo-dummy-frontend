@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Option } from '../../types';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Checkbox } from '../ui/checkbox';
-import { Badge } from '../ui/badge';
+;
 
 interface OptionSelectorProps {
   options: Option[];

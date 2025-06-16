@@ -77,8 +77,7 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
     lastSavedTime,
     updateFormData,
     manualSave,
-    clearData,
-    loadData
+    clearData
   } = useFormPersistence({
     formId: 'verification',
     onSave,
@@ -552,8 +551,8 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
                             });
                           }}
                           className="w-full h-full"
-                          autoCapture={true}
-                          captureInterval={2000}
+
+
                         />
                         <FaceGuidance
                           isActive={livenessState.isActive}
