@@ -4,27 +4,22 @@ import { PaymentDemoPage } from './components/pages/PaymentDemoPage';
 import { ContractCompletionPage } from './components/pages/ContractCompletionPage';
 import { ContractConfirmationPage } from './components/pages/ContractConfirmationPage';
 import { TrackingPage } from './components/shipping/TrackingPage';
+import { MyPage } from './components/pages/MyPage';
 
 function App() {
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking'>('demo');
-  const [contractData, setContractData] = useState<any>(null);
 
+  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking' | 'mypage'>('demo');
+  const [contractData, setContractData] = useState<any>(null);
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200">
+      <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">Ahamo Admin</h1>
+              <h1 className="text-xl font-bold text-gray-900">ahamo</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowAdmin(!showAdmin)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-              >
-                {showAdmin ? 'コンポーネント表示' : 'デバイス管理'}
-              </button>
+              <span className="text-gray-700 px-3 py-2 rounded-md text-sm font-medium">マイページ</span>
             </div>
           </div>
         </div>
@@ -69,6 +64,12 @@ function App() {
             className="px-4 py-2 bg-indigo-600 text-white rounded"
           >
             配送追跡デモ
+          </button>
+          <button 
+            onClick={() => setCurrentView('mypage')}
+            className="px-4 py-2 bg-teal-600 text-white rounded"
+          >
+            マイページ
           </button>
         </div>
         
@@ -154,6 +155,12 @@ function App() {
         {currentView === 'tracking' && (
           <div className="mt-8">
             <TrackingPage trackingNumber="YMT123456789" />
+          </div>
+        )}
+
+        {currentView === 'mypage' && (
+          <div className="mt-8">
+            <MyPage contractId="contract-1" />
           </div>
         )}
       </div>

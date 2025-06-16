@@ -13,6 +13,7 @@ export interface Contract {
   status: 'draft' | 'active' | 'cancelled' | 'completed';
   createdAt: string;
   updatedAt: string;
+  options?: string[];
   customerInfo: {
     name: string;
     email: string;
@@ -42,23 +43,37 @@ export interface FeeCalculationRequest {
 }
 
 export interface FeeCalculationResult {
-  totalFee: number;
-  breakdown: {
-    baseFee: number;
-    callFee: number;
-    dataFee: number;
-    optionFees: {
-      id: string;
-      name: string;
-      fee: number;
-    }[];
-    discounts: {
-      id: string;
-      name: string;
-      amount: number;
-    }[];
-  };
+  baseFee: number;
+  optionsFee: number;
+  discounts: number;
+  taxExcluded: number;
+  tax: number;
   taxIncluded: number;
+}
+
+export interface PlanChangeRequest {
+  newPlanId: string;
+  reason?: string;
+  effectiveDate: string;
+}
+
+export interface PlanChangeSimulation {
+  currentPlan: Plan;
+  newPlan: Plan;
+  feeComparison: {
+    current: FeeCalculationResult;
+    new: FeeCalculationResult;
+    difference: number;
+  };
+  optionCompatibility: {
+    compatible: Option[];
+    incompatible: Option[];
+  };
+}
+
+export interface OptionManagementRequest {
+  optionId: string;
+  reason?: string;
 }
 
 export interface UsagePattern {
@@ -263,6 +278,53 @@ export interface ShippingFormData {
   delegationInfo?: string;
   deliveryNotes?: string;
   absenceHandling?: string;
+}
+
+export interface ContractDetails extends Contract {
+  plan: Plan;
+  device?: Device;
+  optionDetails?: Option[];
+  totalMonthlyFee?: number;
+  contractPeriod?: {
+    startDate: string;
+    endDate?: string;
+  };
+}
+
+export interface ContractChangeHistory {
+  id: number;
+  changeType: 'PLAN_CHANGE' | 'OPTION_ADD' | 'OPTION_REMOVE' | 'OPTION_SUSPEND';
+  oldValue?: string;
+  newValue?: string;
+  reason?: string;
+  effectiveDate?: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+export interface PlanChangeRequest {
+  newPlanId: string;
+  reason?: string;
+  effectiveDate: string;
+}
+
+export interface PlanChangeSimulation {
+  currentPlan: Plan;
+  newPlan: Plan;
+  feeComparison: {
+    current: FeeCalculationResult;
+    new: FeeCalculationResult;
+    difference: number;
+  };
+  optionCompatibility: {
+    compatible: Option[];
+    incompatible: Option[];
+  };
+}
+
+export interface OptionManagementRequest {
+  optionId: string;
+  reason?: string;
 }
 
 export interface TrackingData {
