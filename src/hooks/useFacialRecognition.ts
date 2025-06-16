@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { 
   faceRecognitionService, 
   FacialDetectionRequest, 
-  FacialDetectionResponse,
+
   FaceComparisonRequest,
   FaceComparisonResponse 
 } from '../services/faceRecognitionService';

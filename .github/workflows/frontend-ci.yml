@@ -2,7 +2,7 @@ name: Frontend CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'devin/**' ]
     paths-ignore:
       - '**.md'
       - 'docs/**'
