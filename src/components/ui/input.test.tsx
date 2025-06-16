@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '../../test/utils'
 import { testAccessibility } from '../../test/utils'
 import { Input } from './input'
-import { describe, it, expect, vi } from 'vitest'
 
 describe('Input', () => {
   it('基本的な入力フィールドがレンダリングされる', () => {

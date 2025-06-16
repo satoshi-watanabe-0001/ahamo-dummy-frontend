@@ -1,7 +1,6 @@
 import { render, screen } from '../../test/utils'
 import { testAccessibility } from '../../test/utils'
 import { Badge } from './badge'
-import { describe, it, expect } from 'vitest'
 
 describe('Badge', () => {
   it('デフォルトバッジが正しくレンダリングされる', () => {

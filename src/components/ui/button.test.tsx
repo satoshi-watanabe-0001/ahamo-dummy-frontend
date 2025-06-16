@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '../../test/utils'
 import { testAccessibility } from '../../test/utils'
 import { Button } from './button'
-import { describe, it, expect, vi } from 'vitest'
 
 describe('Button', () => {
   it('デフォルトボタンが正しくレンダリングされる', () => {

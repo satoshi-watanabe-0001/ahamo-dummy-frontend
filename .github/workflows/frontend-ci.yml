@@ -41,12 +41,7 @@ jobs:
         echo "🧪 単体テスト実行中..."
         npm run test || true
         
-    - name: Run tests with UI
-      run: |
-        echo "🧩 テストUI実行中..."
-        npm run test:ui --run || echo "テストUI設定が存在しない場合はスキップ"
-        
-    - name: Generate test coverage
+    - name: Run tests with coverage
       run: |
         echo "📊 テストカバレッジ生成中..."
         npm run test:coverage || true
