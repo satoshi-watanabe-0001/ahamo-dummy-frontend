@@ -71,7 +71,7 @@ export const useImageAnalysis = (
   const startAnalysis = useCallback(() => {
     if (intervalRef.current) return;
 
-    intervalRef.current = setInterval(analyzeCurrentFrame, interval);
+    intervalRef.current = setInterval(analyzeCurrentFrame, interval) as unknown as number;
   }, [analyzeCurrentFrame, interval]);
 
   const stopAnalysis = useCallback(() => {

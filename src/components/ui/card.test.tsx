@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '../../test/utils'
 import { testAccessibility } from '../../test/utils'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card'
-import { describe, it, expect, vi } from 'vitest'
 
 describe('Card Components', () => {
   describe('Card', () => {

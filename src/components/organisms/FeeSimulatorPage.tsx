@@ -5,15 +5,13 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 
 export const FeeSimulatorPage = () => {
   const [selectedPlanId, setSelectedPlanId] = useState<string>('plan_basic_001');
-  const [usageParams, setUsageParams] = useState({
+  const [usageParams, ] = useState({
     dataUsage: 15,
     callMinutes: 120,
     smsCount: 20
   });
 
-  const handleUsageChange = (newUsage: typeof usageParams) => {
-    setUsageParams(newUsage);
-  };
+
 
   return (
     <div className="space-y-8">

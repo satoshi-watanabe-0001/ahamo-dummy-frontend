@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '../../test/utils'
 import { testAccessibility } from '../../test/utils'
 import { Switch } from './switch'
-import { describe, it, expect, vi } from 'vitest'
 
 describe('Switch', () => {
   it('基本的なスイッチがレンダリングされる', () => {

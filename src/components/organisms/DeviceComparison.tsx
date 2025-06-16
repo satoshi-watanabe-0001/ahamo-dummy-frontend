@@ -1,6 +1,6 @@
 import { Button } from '../ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { Badge } from '../ui/badge';
+;
 import { Device } from '../../types';
 
 interface DeviceComparisonProps {

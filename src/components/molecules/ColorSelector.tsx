@@ -30,10 +30,7 @@ export function ColorSelector({
     return inventory?.find(inv => inv.color === color);
   };
 
-  const getStorageInventory = (color: string, storage: string) => {
-    const colorInv = getColorInventory(color);
-    return colorInv?.storageOptions.find(opt => opt.storage === storage);
-  };
+
 
   return (
     <div className="space-y-6">
