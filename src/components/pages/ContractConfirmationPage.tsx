@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
 import { SaveStatus } from '../ui/save-status';
 import { ContractSummary } from '../organisms/ContractSummary';
 import { ImportantTermsHighlight } from '../organisms/ImportantTermsHighlight';
 import { ConfirmationChecklist } from '../molecules/ConfirmationChecklist';
-import { FeeBreakdown } from '../molecules/FeeBreakdown';
+import { EnhancedFeeBreakdown } from '../molecules/EnhancedFeeBreakdown';
 import { useFormPersistence } from '../../hooks/useFormPersistence';
 import { contractApi, planApi, deviceApi, feeApi } from '../../utils/api';
 import { Contract, Plan, Device, FeeCalculationResult } from '../../types';
@@ -22,6 +22,7 @@ interface ContractConfirmationPageProps {
   onChangePlan?: () => void;
   onChangeDevice?: () => void;
   onChangePersonalInfo?: () => void;
+  selectedDevice?: Device | null;
 }
 
 export const ContractConfirmationPage = ({ 
@@ -29,7 +30,8 @@ export const ContractConfirmationPage = ({
   onBack, 
   onChangePlan, 
   onChangeDevice, 
-  onChangePersonalInfo 
+  onChangePersonalInfo,
+  selectedDevice 
 }: ContractConfirmationPageProps) => {
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
   const [contract, setContract] = useState<Contract | null>(null);
@@ -66,7 +68,9 @@ export const ContractConfirmationPage = ({
             setPlan(planResponse.data as Plan);
           }
 
-          if (currentContract.deviceId) {
+          if (selectedDevice) {
+            setDevice(selectedDevice);
+          } else if (currentContract.deviceId) {
             const deviceResponse = await deviceApi.getDevice(currentContract.deviceId);
             setDevice(deviceResponse.data as Device);
           }
@@ -91,7 +95,7 @@ export const ContractConfirmationPage = ({
     };
 
     loadContractData();
-  }, []);
+  }, [selectedDevice]);
 
   useEffect(() => {
     updateFormData({ checkedItems });
@@ -180,7 +184,7 @@ export const ContractConfirmationPage = ({
           </div>
           
           <div className="space-y-6">
-            {feeResult && <FeeBreakdown result={feeResult} />}
+            {feeResult && <EnhancedFeeBreakdown result={feeResult} device={device} />}
             <ImportantTermsHighlight />
           </div>
         </div>

@@ -5,11 +5,18 @@ import { ContractCompletionPage } from './components/pages/ContractCompletionPag
 import { ContractConfirmationPage } from './components/pages/ContractConfirmationPage';
 import { TrackingPage } from './components/shipping/TrackingPage';
 import { MyPage } from './components/pages/MyPage';
+import { DeviceCatalog } from './components/device/DeviceCatalog';
+import { DeviceDetail } from './components/organisms/DeviceDetail';
+import { DeviceComparisonPage } from './components/pages/DeviceComparisonPage';
+import { Device } from './types';
+import { deviceApi } from './utils/api';
 
 function App() {
 
-  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking' | 'mypage'>('demo');
+  const [currentView, setCurrentView] = useState<'demo' | 'device-catalog' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking' | 'mypage'>('demo');
   const [contractData, setContractData] = useState<any>(null);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const [selectedDeviceData, setSelectedDeviceData] = useState<Device | null>(null);
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm border-b">
@@ -83,8 +90,9 @@ function App() {
               }}
               onBack={() => setCurrentView('demo')}
               onChangePlan={() => console.log('プラン変更')}
-              onChangeDevice={() => console.log('デバイス変更')}
+              onChangeDevice={() => setCurrentView('device-catalog')}
               onChangePersonalInfo={() => console.log('個人情報変更')}
+              selectedDevice={selectedDeviceData}
             />
           </div>
         )}
@@ -148,6 +156,62 @@ function App() {
                 }
               }}
               onBackToHome={() => setCurrentView('demo')}
+            />
+          </div>
+        )}
+
+        {currentView === 'device-catalog' && (
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-6">
+              <button 
+                onClick={() => setCurrentView('contract-confirmation')}
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              >
+                ← 契約確認に戻る
+              </button>
+              <h1 className="text-3xl font-bold">デバイス選択</h1>
+              <div></div>
+            </div>
+            <DeviceCatalog 
+              onDeviceSelect={(deviceId) => {
+                setSelectedDeviceId(deviceId);
+                setCurrentView('device-detail');
+              }}
+            />
+          </div>
+        )}
+
+        {currentView === 'device-detail' && selectedDeviceId && (
+          <div className="mt-8">
+            <DeviceDetail 
+              deviceId={selectedDeviceId}
+              onBack={() => setCurrentView('device-catalog')}
+              onShowComparison={() => setCurrentView('device-comparison')}
+            />
+            <div className="mt-6 flex justify-center">
+              <button 
+                onClick={async () => {
+                  try {
+                    const deviceResponse = await deviceApi.getDevice(selectedDeviceId);
+                    const deviceData = deviceResponse.data as Device;
+                    setSelectedDeviceData(deviceData);
+                    setCurrentView('contract-confirmation');
+                  } catch (error) {
+                    console.error('Failed to load device data:', error);
+                  }
+                }}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              >
+                このデバイスで契約を進める
+              </button>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'device-comparison' && (
+          <div className="mt-8">
+            <DeviceComparisonPage 
+              onBack={() => setCurrentView('device-detail')}
             />
           </div>
         )}
