@@ -3,10 +3,11 @@ import { ShippingFormDemo } from './components/forms/ShippingFormDemo';
 import { PaymentDemoPage } from './components/pages/PaymentDemoPage';
 import { ContractCompletionPage } from './components/pages/ContractCompletionPage';
 import { ContractConfirmationPage } from './components/pages/ContractConfirmationPage';
+import { TrackingPage } from './components/shipping/TrackingPage';
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
-  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo'>('demo');
+  const [currentView, setCurrentView] = useState<'demo' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking'>('demo');
   const [contractData, setContractData] = useState<any>(null);
 
   return (
@@ -62,6 +63,12 @@ function App() {
             className="px-4 py-2 bg-orange-600 text-white rounded"
           >
             決済結果デモ
+          </button>
+          <button 
+            onClick={() => setCurrentView('tracking')}
+            className="px-4 py-2 bg-indigo-600 text-white rounded"
+          >
+            配送追跡デモ
           </button>
         </div>
         
@@ -141,6 +148,12 @@ function App() {
               }}
               onBackToHome={() => setCurrentView('demo')}
             />
+          </div>
+        )}
+
+        {currentView === 'tracking' && (
+          <div className="mt-8">
+            <TrackingPage trackingNumber="YMT123456789" />
           </div>
         )}
       </div>
