@@ -30,7 +30,7 @@ export function DeviceCatalog({ className, onDeviceSelect }: DeviceCatalogProps)
     try {
       setLoading(true);
       const response = await deviceApi.getDevices();
-      setDevices(response.data.devices || []);
+      setDevices((response.data as any)?.devices || []);
     } catch (error) {
       console.error('Failed to load devices:', error);
     } finally {
