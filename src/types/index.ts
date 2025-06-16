@@ -326,3 +326,30 @@ export interface OptionManagementRequest {
   optionId: string;
   reason?: string;
 }
+
+export interface TrackingData {
+  trackingNumber: string;
+  status: string;
+  events: TrackingEvent[];
+  estimatedDelivery: string;
+}
+
+export interface TrackingEvent {
+  id: number;
+  status: string;
+  location: string;
+  latitude?: number;
+  longitude?: number;
+  estimatedArrivalTime?: string;
+  timestamp: string;
+  description: string;
+}
+
+export interface LocationUpdate {
+  latitude: number;
+  longitude: number;
+  currentLocation: string;
+  estimatedArrivalTime: string;
+  status: string;
+  timestamp: string;
+}
