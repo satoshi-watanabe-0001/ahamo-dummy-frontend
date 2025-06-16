@@ -23,7 +23,7 @@ export const DeliveryRating: React.FC<DeliveryRatingProps> = ({ trackingNumber }
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/shipping/confirm-delivery/${trackingNumber}`, {
+      const response = await fetch(`/api/v1/shipping/confirm-delivery/${trackingNumber}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -153,23 +153,23 @@ if (USE_MOCK_API) {
 export const apiClient = USE_MOCK_API ? mockApiClient : new ApiClient();
 
 export const contractApi = USE_MOCK_API ? mockContractApi : {
-  getContracts: () => apiClient.get('/api/contracts'),
-  getContract: (id: string) => apiClient.get(`/api/contracts/${id}`),
-  createContract: (data: any) => apiClient.post('/api/contracts', data),
-  updateContract: (id: string, data: any) => apiClient.put(`/api/contracts/${id}`, data),
-  deleteContract: (id: string) => apiClient.delete(`/api/contracts/${id}`),
-  confirmContract: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/confirm`, data),
-  generateContractDocument: (id: string) => apiClient.get(`/api/contracts/${id}/document`),
-  getContractDetails: (id: string) => apiClient.get(`/api/contracts/${id}/details`),
-  getContractHistory: (id: string) => apiClient.get(`/api/contracts/${id}/history`),
-  getCurrentOptions: (id: string) => apiClient.get(`/api/contracts/${id}/options`),
-  changePlan: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/plan-change`, data),
-  simulatePlanChange: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/plan-change/simulate`, data),
-  getAvailablePlans: (id: string) => apiClient.get(`/api/contracts/${id}/available-plans`),
-  addOption: (id: string, data: any) => apiClient.post(`/api/contracts/${id}/options`, data),
-  removeOption: (id: string, optionId: string) => apiClient.delete(`/api/contracts/${id}/options/${optionId}`),
-  suspendOption: (id: string, optionId: string) => apiClient.put(`/api/contracts/${id}/options/${optionId}/suspend`),
-  getAvailableOptions: (id: string) => apiClient.get(`/api/contracts/${id}/available-options`)
+  getContracts: () => apiClient.get('/api/v1/contracts'),
+  getContract: (id: string) => apiClient.get(`/api/v1/contracts/${id}`),
+  createContract: (data: any) => apiClient.post('/api/v1/contracts', data),
+  updateContract: (id: string, data: any) => apiClient.put(`/api/v1/contracts/${id}`, data),
+  deleteContract: (id: string) => apiClient.delete(`/api/v1/contracts/${id}`),
+  confirmContract: (id: string, data: any) => apiClient.post(`/api/v1/contracts/${id}/confirm`, data),
+  generateContractDocument: (id: string) => apiClient.get(`/api/v1/contracts/${id}/document`),
+  getContractDetails: (id: string) => apiClient.get(`/api/v1/contracts/${id}/details`),
+  getContractHistory: (id: string) => apiClient.get(`/api/v1/contracts/${id}/history`),
+  getCurrentOptions: (id: string) => apiClient.get(`/api/v1/contracts/${id}/options`),
+  changePlan: (id: string, data: any) => apiClient.post(`/api/v1/contracts/${id}/plan-change`, data),
+  simulatePlanChange: (id: string, data: any) => apiClient.post(`/api/v1/contracts/${id}/plan-change/simulate`, data),
+  getAvailablePlans: (id: string) => apiClient.get(`/api/v1/contracts/${id}/available-plans`),
+  addOption: (id: string, data: any) => apiClient.post(`/api/v1/contracts/${id}/options`, data),
+  removeOption: (id: string, optionId: string) => apiClient.delete(`/api/v1/contracts/${id}/options/${optionId}`),
+  suspendOption: (id: string, optionId: string) => apiClient.put(`/api/v1/contracts/${id}/options/${optionId}/suspend`),
+  getAvailableOptions: (id: string) => apiClient.get(`/api/v1/contracts/${id}/available-options`)
 };
 
 export const planApi = USE_MOCK_API ? mockPlanApi : {
@@ -179,17 +179,17 @@ export const planApi = USE_MOCK_API ? mockPlanApi : {
 
 export const feeApi = USE_MOCK_API ? mockFeeApi : {
   calculateFee: (data: any) => 
-    apiClient.post('/api/calculate-fee', data),
+    apiClient.post('/api/v1/fee/calculate-fee', data),
   calculateTotal: (data: any) => 
-    apiClient.post('/api/calculate-total', data),
+    apiClient.post('/api/v1/fee/calculate-total', data),
   compareFeePlans: (usage: any, planIds: string[]) => 
-    apiClient.post('/api/compare-fee-plans', { usage, planIds }),
+    apiClient.post('/api/v1/fee/compare-fee-plans', { usage, planIds }),
 };
 
 export const deviceApi = USE_MOCK_API ? mockDeviceApi : {
-  getDevices: () => apiClient.get('/api/devices'),
-  getDevice: (id: string) => apiClient.get(`/api/devices/${id}`),
-  getInventory: (id: string) => apiClient.get(`/api/devices/${id}/inventory`),
+  getDevices: () => apiClient.get('/api/v1/devices'),
+  getDevice: (id: string) => apiClient.get(`/api/v1/devices/${id}`),
+  getInventory: (id: string) => apiClient.get(`/api/v1/devices/${id}/inventory`),
 };
 
 export const adminDeviceApi = USE_MOCK_API ? mockAdminDeviceApi : {
@@ -218,22 +218,22 @@ export const adminDeviceApi = USE_MOCK_API ? mockAdminDeviceApi : {
 
 export const optionApi = USE_MOCK_API ? mockOptionApi : {
   getOptions: (category?: string) => 
-    apiClient.get(`/api/options${category ? `?category=${category}` : ''}`),
+    apiClient.get(`/api/v1/options${category ? `?category=${category}` : ''}`),
 };
 
 export const paymentApi = {
-  getPaymentMethods: () => apiClient.get('/api/payments/methods'),
-  processPayment: (data: any) => apiClient.post('/api/payments/process', data),
-  tokenizeCard: (data: any) => apiClient.post('/api/payments/tokenize', data),
-  validateToken: (token: string) => apiClient.post('/api/payments/validate-token', { token }),
-  searchBanks: (query: string) => apiClient.get(`/api/payments/banks/search?q=${encodeURIComponent(query)}`),
+  getPaymentMethods: () => apiClient.get('/api/v1/payments/methods'),
+  processPayment: (data: any) => apiClient.post('/api/v1/payments/process', data),
+  tokenizeCard: (data: any) => apiClient.post('/api/v1/payments/tokenize', data),
+  validateToken: (token: string) => apiClient.post('/api/v1/payments/validate-token', { token }),
+  searchBanks: (query: string) => apiClient.get(`/api/v1/payments/banks/search?q=${encodeURIComponent(query)}`),
   searchBranches: (bankCode: string, query: string) => 
-    apiClient.get(`/api/payments/banks/${bankCode}/branches/search?q=${encodeURIComponent(query)}`),
-  validateBankAccount: (data: any) => apiClient.post('/api/payments/validate-bank-account', data),
-  getPaymentStatus: (paymentId: string) => apiClient.get(`/api/payments/${paymentId}/status`),
-  getPaymentHistory: (contractId: string) => apiClient.get(`/api/payments/history/${contractId}`),
-  checkMethodAvailability: (methodId: string) => apiClient.get(`/api/payments/methods/${methodId}/availability`),
-  retryPayment: (transactionId: string, data: any) => apiClient.post(`/api/payments/${transactionId}/retry`, data)
+    apiClient.get(`/api/v1/payments/banks/${bankCode}/branches/search?q=${encodeURIComponent(query)}`),
+  validateBankAccount: (data: any) => apiClient.post('/api/v1/payments/validate-bank-account', data),
+  getPaymentStatus: (paymentId: string) => apiClient.get(`/api/v1/payments/${paymentId}/status`),
+  getPaymentHistory: (contractId: string) => apiClient.get(`/api/v1/payments/history/${contractId}`),
+  checkMethodAvailability: (methodId: string) => apiClient.get(`/api/v1/payments/methods/${methodId}/availability`),
+  retryPayment: (transactionId: string, data: any) => apiClient.post(`/api/v1/payments/${transactionId}/retry`, data)
 };
 
 export const pollPaymentStatus = async (transactionId: string, maxAttempts: number = 30): Promise<any> => {

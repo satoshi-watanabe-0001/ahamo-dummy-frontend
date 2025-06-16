@@ -48,8 +48,8 @@ class MockApiClient {
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
     await delay(300 + Math.random() * 500);
     
-    if (endpoint.startsWith('/api/payments/') && endpoint.endsWith('/status')) {
-      const transactionId = endpoint.split('/')[3];
+    if (endpoint.startsWith('/api/v1/payments/') && endpoint.endsWith('/status')) {
+      const transactionId = endpoint.split('/')[4];
       return this.getPaymentStatus(transactionId) as Promise<ApiResponse<T>>;
     }
     
@@ -68,13 +68,13 @@ class MockApiClient {
       return createMockResponse(plan as T);
     }
     
-    if (endpoint === '/api/devices') {
+    if (endpoint === '/api/v1/devices') {
       const devices = getStoredDataTyped(STORAGE_KEYS.DEVICES, mockDevices);
       return createMockResponse({ devices, total: devices.length } as T);
     }
     
-    if (endpoint.startsWith('/api/devices/') && endpoint.endsWith('/inventory')) {
-      const id = endpoint.split('/')[3];
+    if (endpoint.startsWith('/api/v1/devices/') && endpoint.endsWith('/inventory')) {
+      const id = endpoint.split('/')[4];
       const devices = getStoredDataTyped(STORAGE_KEYS.DEVICES, mockDevices);
       const device = devices.find(d => d.id === id);
       if (!device) {
@@ -91,7 +91,7 @@ class MockApiClient {
       return createMockResponse({ inventory } as T);
     }
 
-    if (endpoint.startsWith('/api/devices/')) {
+    if (endpoint.startsWith('/api/v1/devices/')) {
       const id = endpoint.split('/').pop();
       const devices = getStoredDataTyped(STORAGE_KEYS.DEVICES, mockDevices);
       const device = devices.find(d => d.id === id);
@@ -115,12 +115,12 @@ class MockApiClient {
       return createMockResponse((csvHeader + csvData) as T);
     }
     
-    if (endpoint === '/api/contracts') {
+    if (endpoint === '/api/v1/contracts') {
       const contracts = getStoredDataTyped(STORAGE_KEYS.CONTRACTS, mockContracts);
       return createMockResponse({ contracts, total: contracts.length } as T);
     }
     
-    if (endpoint.startsWith('/api/contracts/')) {
+    if (endpoint.startsWith('/api/v1/contracts/')) {
       const id = endpoint.split('/').pop();
       const contracts = getStoredDataTyped(STORAGE_KEYS.CONTRACTS, mockContracts);
       const contract = contracts.find(c => c.id === id);
@@ -136,12 +136,12 @@ class MockApiClient {
   async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     await delay(500 + Math.random() * 700);
     
-    if (endpoint === '/api/payments/process') {
+    if (endpoint === '/api/v1/payments/process') {
       return this.processPayment(data) as Promise<ApiResponse<T>>;
     }
     
-    if (endpoint.startsWith('/api/payments/') && endpoint.endsWith('/retry')) {
-      const transactionId = endpoint.split('/')[3];
+    if (endpoint.startsWith('/api/v1/payments/') && endpoint.endsWith('/retry')) {
+      const transactionId = endpoint.split('/')[4];
       return this.retryPayment(transactionId, data) as Promise<ApiResponse<T>>;
     }
     
@@ -159,7 +159,7 @@ class MockApiClient {
       return createMockResponse(newDevice as T, 'デバイスが作成されました');
     }
     
-    if (endpoint === '/api/contracts') {
+    if (endpoint === '/api/v1/contracts') {
       const contracts = getStoredDataTyped(STORAGE_KEYS.CONTRACTS, mockContracts);
       const newContract: Contract = {
         ...data,
@@ -188,7 +188,7 @@ class MockApiClient {
       return createMockResponse(devices[index] as T, 'デバイスが更新されました');
     }
     
-    if (endpoint.startsWith('/api/contracts/')) {
+    if (endpoint.startsWith('/api/v1/contracts/')) {
       const id = endpoint.split('/').pop();
       const contracts = getStoredDataTyped(STORAGE_KEYS.CONTRACTS, mockContracts);
       const index = contracts.findIndex(c => c.id === id);
@@ -222,7 +222,7 @@ class MockApiClient {
       return createMockResponse(deletedDevice as T, 'デバイスが削除されました');
     }
     
-    if (endpoint.startsWith('/api/contracts/')) {
+    if (endpoint.startsWith('/api/v1/contracts/')) {
       const id = endpoint.split('/').pop();
       const contracts = getStoredDataTyped(STORAGE_KEYS.CONTRACTS, mockContracts);
       const index = contracts.findIndex(c => c.id === id);
@@ -334,21 +334,21 @@ class MockApiClient {
 export const mockApiClient = new MockApiClient();
 
 export const mockContractApi = {
-  getContracts: () => mockApiClient.get('/api/contracts'),
-  getContract: (id: string) => mockApiClient.get(`/api/contracts/${id}`),
-  createContract: (data: any) => mockApiClient.post('/api/contracts', data),
-  updateContract: (id: string, data: any) => mockApiClient.put(`/api/contracts/${id}`, data),
-  deleteContract: (id: string) => mockApiClient.delete(`/api/contracts/${id}`),
-  getContractDetails: (id: string) => mockApiClient.get(`/api/contracts/${id}/details`),
-  getContractHistory: (id: string) => mockApiClient.get(`/api/contracts/${id}/history`),
-  getCurrentOptions: (id: string) => mockApiClient.get(`/api/contracts/${id}/options`),
-  changePlan: (id: string, data: any) => mockApiClient.post(`/api/contracts/${id}/plan-change`, data),
-  simulatePlanChange: (id: string, data: any) => mockApiClient.post(`/api/contracts/${id}/plan-change/simulate`, data),
-  getAvailablePlans: (id: string) => mockApiClient.get(`/api/contracts/${id}/available-plans`),
-  addOption: (id: string, data: any) => mockApiClient.post(`/api/contracts/${id}/options`, data),
-  removeOption: (id: string, optionId: string) => mockApiClient.delete(`/api/contracts/${id}/options/${optionId}`),
-  suspendOption: (id: string, optionId: string) => mockApiClient.put(`/api/contracts/${id}/options/${optionId}/suspend`),
-  getAvailableOptions: (id: string) => mockApiClient.get(`/api/contracts/${id}/available-options`),
+  getContracts: () => mockApiClient.get('/api/v1/contracts'),
+  getContract: (id: string) => mockApiClient.get(`/api/v1/contracts/${id}`),
+  createContract: (data: any) => mockApiClient.post('/api/v1/contracts', data),
+  updateContract: (id: string, data: any) => mockApiClient.put(`/api/v1/contracts/${id}`, data),
+  deleteContract: (id: string) => mockApiClient.delete(`/api/v1/contracts/${id}`),
+  getContractDetails: (id: string) => mockApiClient.get(`/api/v1/contracts/${id}/details`),
+  getContractHistory: (id: string) => mockApiClient.get(`/api/v1/contracts/${id}/history`),
+  getCurrentOptions: (id: string) => mockApiClient.get(`/api/v1/contracts/${id}/options`),
+  changePlan: (id: string, data: any) => mockApiClient.post(`/api/v1/contracts/${id}/plan-change`, data),
+  simulatePlanChange: (id: string, data: any) => mockApiClient.post(`/api/v1/contracts/${id}/plan-change/simulate`, data),
+  getAvailablePlans: (id: string) => mockApiClient.get(`/api/v1/contracts/${id}/available-plans`),
+  addOption: (id: string, data: any) => mockApiClient.post(`/api/v1/contracts/${id}/options`, data),
+  removeOption: (id: string, optionId: string) => mockApiClient.delete(`/api/v1/contracts/${id}/options/${optionId}`),
+  suspendOption: (id: string, optionId: string) => mockApiClient.put(`/api/v1/contracts/${id}/options/${optionId}/suspend`),
+  getAvailableOptions: (id: string) => mockApiClient.get(`/api/v1/contracts/${id}/available-options`),
   generateContractDocument: async (contractId: string): Promise<ApiResponse<Blob>> => {
     await delay(1000 + Math.random() * 1500);
     
@@ -417,9 +417,9 @@ export const mockPlanApi = {
 };
 
 export const mockDeviceApi = {
-  getDevices: () => mockApiClient.get('/api/devices'),
-  getDevice: (id: string) => mockApiClient.get(`/api/devices/${id}`),
-  getInventory: (id: string) => mockApiClient.get(`/api/devices/${id}/inventory`),
+  getDevices: () => mockApiClient.get('/api/v1/devices'),
+  getDevice: (id: string) => mockApiClient.get(`/api/v1/devices/${id}`),
+  getInventory: (id: string) => mockApiClient.get(`/api/v1/devices/${id}/inventory`),
 };
 
 
