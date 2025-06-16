@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ProgressIndicator } from '../ui/progress-indicator';
 import { DeviceCatalog } from '../device/DeviceCatalog';
-
+import { mockDevices } from '../../data/mockData';
 import { Device } from '../../types';
 
 interface DeviceSelectionFlowProps {
@@ -51,27 +51,28 @@ export const DeviceSelectionFlow = ({ onSubmit, onBack, selectedDevice }: Device
           <DeviceCatalog
             onDeviceSelect={(deviceId: string) => {
               console.log('Device selected:', deviceId);
-              const mockDevice: Device = {
-                id: deviceId,
-                name: deviceId.includes('iphone-15-pro') ? 'iPhone 15 Pro' : 
-                      deviceId.includes('iphone-15') ? 'iPhone 15' :
-                      deviceId.includes('galaxy-s24-ultra') ? 'Galaxy S24 Ultra' :
-                      deviceId.includes('galaxy-s24') ? 'Galaxy S24' : 'Selected Device',
-                price: deviceId.includes('iphone-15-pro') ? 159800 : 
-                       deviceId.includes('iphone-15') ? 124800 :
-                       deviceId.includes('galaxy-s24-ultra') ? 189700 :
-                       deviceId.includes('galaxy-s24') ? 124700 : 100000,
-                brand: deviceId.includes('iphone') ? 'Apple' : 'Samsung',
-                category: deviceId.includes('iphone') ? 'iPhone' : 'Android',
-                priceRange: deviceId.includes('pro') || deviceId.includes('ultra') ? 'premium' : 'mid',
-                colors: ['ブラック', 'ホワイト', 'ブルー'],
-                storageOptions: ['128GB', '256GB', '512GB'],
-                inStock: true,
-                releaseDate: '2024-01-01',
-                popularity: 85
-              };
-              setSelectedDeviceData(mockDevice);
-              setCurrentView('detail');
+              const actualDevice = mockDevices.find(d => d.id === deviceId);
+              if (actualDevice) {
+                setSelectedDeviceData(actualDevice);
+                setCurrentView('detail');
+              } else {
+                console.error('Device not found:', deviceId);
+                const fallbackDevice: Device = {
+                  id: deviceId,
+                  name: 'Selected Device',
+                  price: 100000,
+                  brand: 'Unknown',
+                  category: 'iPhone',
+                  priceRange: 'mid',
+                  colors: ['ブラック', 'ホワイト', 'ブルー'],
+                  storageOptions: ['128GB', '256GB', '512GB'],
+                  inStock: true,
+                  releaseDate: '2024-01-01',
+                  popularity: 85
+                };
+                setSelectedDeviceData(fallbackDevice);
+                setCurrentView('detail');
+              }
             }}
           />
           <div className="flex justify-between pt-6 border-t mt-8">
