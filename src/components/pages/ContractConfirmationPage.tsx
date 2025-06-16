@@ -149,11 +149,11 @@ export const ContractConfirmationPage = ({
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-sm">
       <ProgressIndicator 
-        currentStep={5}
-        totalSteps={6}
-        steps={['個人情報', 'プラン選択', '本人確認', '決済', '契約確認', '完了']}
+        currentStep={8}
+        totalSteps={10}
+        steps={['契約タイプ', '利用状況', 'プラン選択', '端末選択', '料金確認', '個人情報', '本人確認', '決済', '契約確認', '完了']}
         showCompletionStatus={true}
-        completedSteps={['personal-info', 'plan-selection', 'verification', 'payment']}
+        completedSteps={['contract-type', 'usage-profile', 'plan-selection', 'device-selection', 'pricing-confirmation', 'personal-info', 'verification', 'payment']}
       />
       
       <SaveStatus

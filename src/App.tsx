@@ -8,12 +8,13 @@ import { MyPage } from './components/pages/MyPage';
 import { DeviceCatalog } from './components/device/DeviceCatalog';
 import { DeviceDetail } from './components/organisms/DeviceDetail';
 import { DeviceComparisonPage } from './components/pages/DeviceComparisonPage';
+import { PurchaseFlowContainer } from './components/containers/PurchaseFlowContainer';
 import { Device } from './types';
 import { deviceApi } from './utils/api';
 
 function App() {
 
-  const [currentView, setCurrentView] = useState<'demo' | 'device-catalog' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking' | 'mypage'>('demo');
+  const [currentView, setCurrentView] = useState<'demo' | 'unified-flow' | 'device-catalog' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking' | 'mypage'>('demo');
   const [contractData, setContractData] = useState<any>(null);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const [selectedDeviceData, setSelectedDeviceData] = useState<Device | null>(null);
@@ -41,6 +42,12 @@ function App() {
             className="px-4 py-2 bg-blue-600 text-white rounded"
           >
             Demo
+          </button>
+          <button 
+            onClick={() => setCurrentView('unified-flow')}
+            className="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            統合購入フロー (10ステップ)
           </button>
           <button 
             onClick={() => setCurrentView('contract-confirmation')}
@@ -156,6 +163,14 @@ function App() {
                 }
               }}
               onBackToHome={() => setCurrentView('demo')}
+            />
+          </div>
+        )}
+
+        {currentView === 'unified-flow' && (
+          <div className="mt-8">
+            <PurchaseFlowContainer 
+              onComplete={() => setCurrentView('demo')}
             />
           </div>
         )}

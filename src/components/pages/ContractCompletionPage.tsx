@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { ProgressIndicator } from '../ui/progress-indicator';
 import { ContractCompletionSummary } from '../organisms/ContractCompletionSummary';
@@ -24,8 +24,8 @@ export const ContractCompletionPage = ({
 }: ContractCompletionPageProps) => {
   const [loading, setLoading] = useState(false);
   const [contract, setContract] = useState<Contract | null>(contractData?.contract || null);
-  const [plan, setPlan] = useState<Plan | null>(contractData?.plan || null);
-  const [device, setDevice] = useState<Device | null>(contractData?.device || null);
+  const [plan] = useState<Plan | null>(contractData?.plan || null);
+  const [device] = useState<Device | null>(contractData?.device || null);
 
   useEffect(() => {
     if (!contractData && !contract) {
@@ -90,11 +90,11 @@ export const ContractCompletionPage = ({
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-sm">
       <ProgressIndicator 
-        currentStep={6}
-        totalSteps={6}
-        steps={['個人情報', 'プラン選択', '本人確認', '決済', '契約確認', '完了']}
+        currentStep={9}
+        totalSteps={10}
+        steps={['契約タイプ', '利用状況', 'プラン選択', '端末選択', '料金確認', '個人情報', '本人確認', '決済', '契約確認', '完了']}
         showCompletionStatus={true}
-        completedSteps={['personal-info', 'plan-selection', 'verification', 'payment', 'contract-confirmation', 'completion']}
+        completedSteps={['contract-type', 'usage-profile', 'plan-selection', 'device-selection', 'pricing-confirmation', 'personal-info', 'verification', 'payment', 'contract-confirmation']}
       />
 
       <div className="text-center mb-8">

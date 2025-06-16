@@ -77,8 +77,7 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
     lastSavedTime,
     updateFormData,
     manualSave,
-    clearData,
-    loadData
+    clearData
   } = useFormPersistence({
     formId: 'verification',
     onSave,
@@ -329,11 +328,11 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
       
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-sm">
         <ProgressIndicator 
-          currentStep={3}
-          totalSteps={6}
-          steps={['個人情報', 'プラン選択', '本人確認', '決済', '契約確認', '完了']}
+          currentStep={6}
+          totalSteps={10}
+          steps={['契約タイプ', '利用状況', 'プラン選択', '端末選択', '料金確認', '個人情報', '本人確認', '決済', '契約確認', '完了']}
           showCompletionStatus={true}
-          completedSteps={['personal-info', 'plan-selection']}
+          completedSteps={['contract-type', 'usage-profile', 'plan-selection', 'device-selection', 'pricing-confirmation', 'personal-info']}
         />
         
         <SaveStatus
@@ -552,8 +551,6 @@ export const VerificationForm = ({ onSubmit, onSave, onBack }: VerificationFormP
                             });
                           }}
                           className="w-full h-full"
-                          autoCapture={true}
-                          captureInterval={2000}
                         />
                         <FaceGuidance
                           isActive={livenessState.isActive}
