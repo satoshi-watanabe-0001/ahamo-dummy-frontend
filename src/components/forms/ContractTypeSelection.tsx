@@ -93,17 +93,19 @@ export const ContractTypeSelection = ({ onSubmit, onSave, onBack }: ContractType
     if (savedData?.contractType && setValue) {
       setValue('contractType', savedData.contractType);
     }
-  }, [loadData, setValue]);
+  }, []);
 
   const contractType = watch('contractType');
 
   useEffect(() => {
     const subscription = watch((data) => {
-      updateFormData(data);
-      onSave?.(data as ContractTypeData);
+      if (data && Object.keys(data).length > 0) {
+        updateFormData(data);
+        onSave?.(data as ContractTypeData);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [watch, onSave, updateFormData]);
+  }, []);
 
   const handleFormSubmit = (data: ContractTypeData) => {
     clearData();
