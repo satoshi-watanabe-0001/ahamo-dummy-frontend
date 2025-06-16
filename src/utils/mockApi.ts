@@ -784,14 +784,11 @@ export const mockFeeApi = {
     const taxIncluded = Math.round(totalFee * 1.1);
 
     const result = {
-      totalFee,
-      breakdown: {
-        baseFee,
-        callFee: callFee + smsFee,
-        dataFee,
-        optionFees,
-        discounts: []
-      },
+      baseFee,
+      optionsFee: optionFees,
+      discounts: 0,
+      taxExcluded: totalFee,
+      tax: Math.round(totalFee * 0.1),
       taxIncluded
     };
 
@@ -819,14 +816,11 @@ export const mockFeeApi = {
       const taxIncluded = Math.round(totalFee * 1.1);
 
       return {
-        totalFee,
-        breakdown: {
-          baseFee,
-          callFee: callFee + smsFee,
-          dataFee,
-          optionFees: [],
-          discounts: []
-        },
+        baseFee,
+        optionsFee: 0,
+        discounts: 0,
+        taxExcluded: totalFee,
+        tax: Math.round(totalFee * 0.1),
         taxIncluded
       };
     }).filter(Boolean);

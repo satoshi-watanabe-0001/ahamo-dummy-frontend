@@ -16,8 +16,12 @@ const PROGRESS_STORAGE_KEY = 'ahamo_contract_progress';
 
 export const progressManager = {
   getDefaultSteps: (): FormStep[] => [
-    { id: 'personal-info', name: '個人情報', completed: false },
+    { id: 'contract-type', name: '契約タイプ', completed: false },
+    { id: 'usage-profile', name: '利用状況', completed: false },
     { id: 'plan-selection', name: 'プラン選択', completed: false },
+    { id: 'device-selection', name: '端末選択', completed: false },
+    { id: 'pricing-confirmation', name: '料金確認', completed: false },
+    { id: 'personal-info', name: '個人情報', completed: false },
     { id: 'verification', name: '本人確認', completed: false },
     { id: 'payment', name: '決済', completed: false },
     { id: 'contract-confirmation', name: '契約確認', completed: false },
