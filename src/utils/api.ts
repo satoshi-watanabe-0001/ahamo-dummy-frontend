@@ -1,11 +1,35 @@
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '';
+const rawApiUrl = (import.meta as any).env?.VITE_API_URL || '';
 const USE_MOCK_API = (import.meta as any).env?.VITE_USE_MOCK_API !== 'false';
 
+function extractCredentialsFromUrl(url: string): { cleanUrl: string; credentials?: string } {
+  if (!url) return { cleanUrl: url };
+  
+  try {
+    const urlObj = new URL(url);
+    if (urlObj.username && urlObj.password) {
+      const credentials = btoa(`${urlObj.username}:${urlObj.password}`);
+      urlObj.username = '';
+      urlObj.password = '';
+      return {
+        cleanUrl: urlObj.toString(),
+        credentials: `Basic ${credentials}`
+      };
+    }
+  } catch (error) {
+    console.warn('Failed to parse API URL:', error);
+  }
+  
+  return { cleanUrl: url };
+}
+
+const { cleanUrl: API_BASE_URL, credentials: API_CREDENTIALS } = extractCredentialsFromUrl(rawApiUrl);
+
 console.log('API Configuration Debug:', {
-  VITE_API_URL: (import.meta as any).env?.VITE_API_URL,
+  VITE_API_URL: rawApiUrl,
   VITE_USE_MOCK_API: (import.meta as any).env?.VITE_USE_MOCK_API,
   API_BASE_URL,
   USE_MOCK_API,
+  hasCredentials: !!API_CREDENTIALS,
   NODE_ENV: (import.meta as any).env?.NODE_ENV,
   MODE: (import.meta as any).env?.MODE
 });
@@ -50,6 +74,7 @@ class ApiClient {
         
         const defaultHeaders = {
           'Content-Type': 'application/json',
+          ...(API_CREDENTIALS ? { 'Authorization': API_CREDENTIALS } : {}),
           ...options.headers,
         };
 
