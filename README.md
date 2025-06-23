@@ -36,8 +36,37 @@ VITE_USE_MOCK_API=true
 **実際のバックエンドAPIを使用:**
 ```bash
 VITE_USE_MOCK_API=false
-VITE_API_URL=http://localhost:8080
+VITE_API_URL=http://localhost:3000
 ```
+
+## バックエンド接続設定
+
+実際のバックエンドAPIに接続する場合：
+
+1. `.env.local`ファイルを作成：
+```
+VITE_USE_MOCK_API=false
+VITE_API_URL=http://localhost:3000
+```
+
+2. バックエンドサーバーを起動：
+```bash
+cd ../ahamo-dummy-backend
+./gradlew bootRun
+```
+
+3. フロントエンドサーバーを起動：
+```bash
+npm run dev
+```
+
+4. ブラウザで http://localhost:5173 にアクセス
+
+## API接続確認
+
+- 開発者ツールのネットワークタブでAPI通信を確認
+- バックエンドAPI（localhost:3000）への通信が正常に行われることを確認
+- 主要機能：認証、支払いトークン化、契約管理、プラン管理
 
 ### モック機能の特徴
 
