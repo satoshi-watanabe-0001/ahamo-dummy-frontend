@@ -1,5 +1,14 @@
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '';
-const USE_MOCK_API = true;
+const USE_MOCK_API = (import.meta as any).env?.VITE_USE_MOCK_API !== 'false';
+
+console.log('API Configuration Debug:', {
+  VITE_API_URL: (import.meta as any).env?.VITE_API_URL,
+  VITE_USE_MOCK_API: (import.meta as any).env?.VITE_USE_MOCK_API,
+  API_BASE_URL,
+  USE_MOCK_API,
+  NODE_ENV: (import.meta as any).env?.NODE_ENV,
+  MODE: (import.meta as any).env?.MODE
+});
 
 export interface ApiResponse<T = any> {
   data: T;
