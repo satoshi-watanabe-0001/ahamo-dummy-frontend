@@ -3,6 +3,9 @@ set -e
 
 echo "🏗️ フロントエンドビルド実行中..."
 
+echo "📦 依存関係インストール中..."
+npm ci
+
 echo "🔍 TypeScript型チェック実行中..."
 ./node_modules/.bin/tsc --noEmit --skipLibCheck
 
