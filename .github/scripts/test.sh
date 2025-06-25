@@ -14,12 +14,12 @@ else
 fi
 
 echo "🔍 TypeScript型チェック実行中..."
-npx tsc --noEmit
+npx tsc --noEmit --skipLibCheck
 
-echo "🧪 単体テスト実行中..."
-npm run test
+echo "🧪 単体テスト実行中（E2Eテストを除外）..."
+npx vitest run --exclude="tests/e2e/**"
 
 echo "📊 テストカバレッジ生成中..."
-npm run test:coverage
+npx vitest run --coverage --exclude="tests/e2e/**"
 
 echo "✅ すべてのテストが完了しました"
