@@ -3,7 +3,11 @@ set -e
 
 echo "🏗️ フロントエンドビルド実行中..."
 
-npm run build
+echo "🔍 TypeScript型チェック実行中..."
+npx tsc --noEmit --skipLibCheck
+
+echo "📦 Viteビルド実行中..."
+npx vite build
 
 echo "📦 S3アップロード用資材準備中..."
 
