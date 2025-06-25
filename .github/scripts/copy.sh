@@ -4,7 +4,7 @@ set -e
 echo "🏗️ フロントエンドビルド実行中..."
 
 echo "🔍 TypeScript型チェック実行中..."
-npx tsc --noEmit --skipLibCheck
+./node_modules/.bin/tsc --noEmit --skipLibCheck
 
 echo "📦 Viteビルド実行中..."
 npx vite build
