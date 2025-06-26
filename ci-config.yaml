@@ -1,0 +1,8 @@
+app:
+  DEPLOY_TARGET: s3
+  TEST_SHELL_PATH: .github/scripts/test.sh
+  COPY_SHELL_PATH: .github/scripts/copy.sh
+
+flags:
+  FLAG_CD_DEPLOY: false
+  FLAG_CD_PROMOTE: false
