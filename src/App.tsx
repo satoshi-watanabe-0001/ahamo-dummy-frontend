@@ -5,19 +5,42 @@ import { ContractCompletionPage } from './components/pages/ContractCompletionPag
 import { ContractConfirmationPage } from './components/pages/ContractConfirmationPage';
 import { TrackingPage } from './components/shipping/TrackingPage';
 import { MyPage } from './components/pages/MyPage';
+import { LoginPage } from './components/pages/LoginPage';
+import { RegisterPage } from './components/pages/RegisterPage';
 import { DeviceCatalog } from './components/device/DeviceCatalog';
 import { DeviceDetail } from './components/organisms/DeviceDetail';
 import { DeviceComparisonPage } from './components/pages/DeviceComparisonPage';
 import { PurchaseFlowContainer } from './components/containers/PurchaseFlowContainer';
 import { Device } from './types';
 import { deviceApi } from './utils/api';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-function App() {
-
-  const [currentView, setCurrentView] = useState<'demo' | 'unified-flow' | 'device-catalog' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking' | 'mypage'>('demo');
+function AppContent() {
+  const { isAuthenticated, user, logout } = useAuth();
+  const [currentView, setCurrentView] = useState<'demo' | 'unified-flow' | 'device-catalog' | 'device-detail' | 'device-comparison' | 'contract-confirmation' | 'contract-completion' | 'shipping-demo' | 'payment-demo' | 'tracking' | 'mypage' | 'login' | 'register'>('demo');
   const [contractData, setContractData] = useState<any>(null);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const [selectedDeviceData, setSelectedDeviceData] = useState<Device | null>(null);
+
+  if (currentView === 'login') {
+    return (
+      <LoginPage 
+        onSuccess={() => setCurrentView('demo')}
+        onSwitchToRegister={() => setCurrentView('register')}
+      />
+    );
+  }
+
+  if (currentView === 'register') {
+    return (
+      <RegisterPage 
+        onSuccess={() => setCurrentView('login')}
+        onSwitchToLogin={() => setCurrentView('login')}
+        onBack={() => setCurrentView('demo')}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm border-b">
@@ -27,7 +50,66 @@ function App() {
               <h1 className="text-xl font-bold text-gray-900">ahamo</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700 px-3 py-2 rounded-md text-sm font-medium">マイページ</span>
+              <button
+                onClick={() => setCurrentView('demo')}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  currentView === 'demo' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                デモ
+              </button>
+              <button
+                onClick={() => setCurrentView('unified-flow')}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  currentView === 'unified-flow' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                統合購入フロー
+              </button>
+              <button
+                onClick={() => setCurrentView('device-catalog')}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  currentView === 'device-catalog' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                端末カタログ
+              </button>
+              <button
+                onClick={() => setCurrentView('mypage')}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  currentView === 'mypage' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                マイページ
+              </button>
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">
+                    {user?.email}
+                  </span>
+                  <button
+                    onClick={logout}
+                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700"
+                  >
+                    ログアウト
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setCurrentView('login')}
+                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700"
+                  >
+                    ログイン
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('register')}
+                    className="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    新規登録
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -84,6 +166,18 @@ function App() {
             className="px-4 py-2 bg-teal-600 text-white rounded"
           >
             マイページ
+          </button>
+          <button 
+            onClick={() => setCurrentView('login')}
+            className="px-4 py-2 bg-yellow-600 text-white rounded"
+          >
+            ログイン
+          </button>
+          <button 
+            onClick={() => setCurrentView('register')}
+            className="px-4 py-2 bg-red-600 text-white rounded"
+          >
+            新規登録
           </button>
         </div>
         
@@ -244,6 +338,14 @@ function App() {
         )}
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

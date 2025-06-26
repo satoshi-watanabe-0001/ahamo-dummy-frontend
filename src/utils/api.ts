@@ -32,9 +32,23 @@ export interface ApiError {
 
 class ApiClient {
   private baseURL: string;
+  private authHeader?: string;
+  private getAuthToken?: () => string | null;
 
-  constructor(baseURL: string = API_BASE_URL) {
-    this.baseURL = baseURL;
+  constructor(baseURL: string = API_BASE_URL, getAuthToken?: () => string | null) {
+    if (baseURL.includes('@')) {
+      const url = new URL(baseURL);
+      if (url.username && url.password) {
+        const credentials = btoa(`${url.username}:${url.password}`);
+        this.authHeader = `Basic ${credentials}`;
+        this.baseURL = `${url.protocol}//${url.host}${url.pathname}`;
+      } else {
+        this.baseURL = baseURL;
+      }
+    } else {
+      this.baseURL = baseURL;
+    }
+    this.getAuthToken = getAuthToken;
   }
 
   private async request<T>(
@@ -48,8 +62,12 @@ class ApiClient {
       try {
         const url = this.baseURL ? `${this.baseURL}${endpoint}` : endpoint;
         
+        const authToken = this.getAuthToken?.();
+        
         const defaultHeaders = {
           'Content-Type': 'application/json',
+          ...(this.authHeader && { 'Authorization': this.authHeader }),
+          ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
           ...options.headers,
         };
 
@@ -159,7 +177,11 @@ if (USE_MOCK_API) {
   initializeMockData();
 }
 
-export const apiClient = USE_MOCK_API ? mockApiClient : new ApiClient();
+const getAuthToken = () => {
+  return localStorage.getItem('auth_token');
+};
+
+export const apiClient = USE_MOCK_API ? mockApiClient : new ApiClient(API_BASE_URL, getAuthToken);
 
 export const contractApi = USE_MOCK_API ? mockContractApi : {
   getContracts: () => apiClient.get('/api/v1/contracts'),
@@ -228,6 +250,63 @@ export const adminDeviceApi = USE_MOCK_API ? mockAdminDeviceApi : {
 export const optionApi = USE_MOCK_API ? mockOptionApi : {
   getOptions: (category?: string) => 
     apiClient.get(`/api/v1/options${category ? `?category=${category}` : ''}`),
+};
+
+export const authApi = USE_MOCK_API ? {
+  login: async (data: { email: string; password: string }) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const users = JSON.parse(localStorage.getItem('ahamo_mock_users') || '[]');
+    const user = users.find((u: any) => u.email === data.email && u.password === data.password);
+    if (!user) {
+      throw { message: 'メールアドレスまたはパスワードが正しくありません', status: 401 };
+    }
+    const accessToken = `mock_token_${Date.now()}`;
+    const refreshToken = `mock_refresh_${Date.now()}`;
+    return { data: { accessToken, refreshToken, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName } } };
+  },
+  register: async (data: any) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const users = JSON.parse(localStorage.getItem('ahamo_mock_users') || '[]');
+    if (users.find((u: any) => u.email === data.email)) {
+      throw { message: 'このメールアドレスは既に登録されています', status: 409 };
+    }
+    const newUser = { ...data, id: `user_${Date.now()}` };
+    users.push(newUser);
+    localStorage.setItem('ahamo_mock_users', JSON.stringify(users));
+    return { data: { message: 'アカウントが作成されました' } };
+  },
+  refresh: async (refreshToken: string) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    console.log('Mock refresh token:', refreshToken);
+    const accessToken = `mock_token_${Date.now()}`;
+    const newRefreshToken = `mock_refresh_${Date.now()}`;
+    return { data: { accessToken, refreshToken: newRefreshToken } };
+  },
+  logout: async () => {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    return { data: { message: 'ログアウトしました' } };
+  },
+  verify: async (data: any) => {
+    await new Promise(resolve => setTimeout(resolve, 400));
+    console.log('Mock verify data:', data);
+    return { data: { message: '認証が完了しました' } };
+  },
+  loginWithContract: async (data: { contractNumber: string; password: string }) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    console.log('Mock contract login:', data);
+    const accessToken = `mock_contract_token_${Date.now()}`;
+    const refreshToken = `mock_contract_refresh_${Date.now()}`;
+    return { data: { accessToken, refreshToken, user: { id: 'contract_user', email: 'contract@example.com' } } };
+  }
+} : {
+  login: (data: { email: string; password: string }) => apiClient.post('/api/v1/auth/login', data),
+  register: (data: any) => apiClient.post('/api/v1/auth/register', data),
+  refresh: (refreshToken: string) => apiClient.post('/api/v1/auth/refresh', { refreshToken }),
+  logout: () => apiClient.post('/api/v1/auth/logout'),
+  verify: (data: { type: string; email?: string; phone?: string; code: string }) => 
+    apiClient.post('/api/v1/auth/verify', data),
+  loginWithContract: (data: { contractNumber: string; password: string }) => 
+    apiClient.post('/api/v1/auth/login/contract', data)
 };
 
 export const paymentApi = {
