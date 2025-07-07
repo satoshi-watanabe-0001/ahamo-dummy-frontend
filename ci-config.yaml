@@ -1,0 +1,8 @@
+app:
+  DEPLOY_TARGET: s3
+  TEST_SHELL_PATH: .github/scripts/test.sh
+  COPY_SHELL_PATH: .github/scripts/copy.sh
+  CONTAINERS:
+    - IMAGE_NAME: ahamo-dummy-frontend
+      CONTAINER_IMAGE_BEFORE: CONTAINER-IMAGE-PATH
+      FVULS_UUID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
